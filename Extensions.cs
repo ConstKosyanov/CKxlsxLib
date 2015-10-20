@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CKxlsxLib
 {
-    public static class Extensions
+    internal static class Extensions
     {
         public static bool rIsMatch(this string local, string pattern, bool IgnoreCase = true)
         {
