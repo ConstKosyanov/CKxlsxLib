@@ -1,0 +1,4 @@
+c:\users\k.kosyanov\documents\visual studio 2013\Projects\CKxlsxLib\CKxlsxLib\bin\Debug\CKxlsxLib.dll
+c:\users\k.kosyanov\documents\visual studio 2013\Projects\CKxlsxLib\CKxlsxLib\bin\Debug\CKxlsxLib.pdb
+c:\users\k.kosyanov\documents\visual studio 2013\Projects\CKxlsxLib\CKxlsxLib\obj\Debug\CKxlsxLib.dll
+c:\users\k.kosyanov\documents\visual studio 2013\Projects\CKxlsxLib\CKxlsxLib\obj\Debug\CKxlsxLib.pdb
