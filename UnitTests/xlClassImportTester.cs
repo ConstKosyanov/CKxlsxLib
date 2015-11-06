@@ -108,5 +108,31 @@ namespace ExcelReaderUnitTestProject
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty2.HasValue));
         }
+
+        [TestMethod]
+        public void EverntTest()
+        {
+            var book = new xlBook();
+            var sh = book.AddSheet("sheet1");
+            sh.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
+            sh.AddCell("Мультизагаловок1", "C1", xlContentType.SharedString);
+            sh.AddCell("Мультизагаловок2", "D1", xlContentType.SharedString);
+            sh.AddCell("дробь", "E1", xlContentType.SharedString);
+            sh.AddCell(1, "A2", xlContentType.Integer);
+            sh.AddCell(DateTime.Now, "B2", xlContentType.Date);
+            sh.AddCell("Какая-то строка", "C2", xlContentType.SharedString);
+            sh.AddCell("Какая-то строка", "D2", xlContentType.SharedString);
+            sh.AddCell("0.15", "E2", xlContentType.Double);
+            sh.AddCell(2, "A3", xlContentType.Integer);
+            sh.AddCell(DateTime.Now, "B3", xlContentType.Date);
+            sh.AddCell("Какая-то строка", "C3", xlContentType.SharedString);
+            sh.AddCell("Какая-то строка", "D3", xlContentType.SharedString);
+            sh.AddCell("0.25", "E3", xlContentType.Double);
+            var memstream = new MemoryStream();
+            xlWriter.Create(book).SaveToStream(memstream);
+
+            xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnValidationFailure: (s, e) => { if (!e.MissingFields.Contains("Поле 1"))Assert.Fail(); });
+            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+        }
     }
 }

@@ -44,6 +44,7 @@
     <Compile Include="Book\xlBook.cs" />
     <Compile Include="Book\xlCell.cs" />
     <Compile Include="Book\xlSheet.cs" />
+    <Compile Include="CKxlsxLibEventArgs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="OpenXmlValidationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

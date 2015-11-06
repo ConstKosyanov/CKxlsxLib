@@ -33,7 +33,12 @@ namespace CKxlsxLib.Reader
                 var captions = GetClassCaptions<T>(true);
                 var cells = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null)
                     .Select(x => ReadCell(x).Item3.ToString()).ToArray();
-                return captions.All(x => x.Any(y => cells.Any(z => string.Equals(y, z, StringComparison.CurrentCultureIgnoreCase))));
+                var missingFields = captions.Where(x => x.All(y => !cells.Any(z => string.Equals(y, z, StringComparison.CurrentCultureIgnoreCase)))).Select(x => x.First());
+                if (missingFields.Any())
+                {
+                    OnValidationFailure(this, new CKxlsxLibEventArgs(missingFields));
+                }
+                return !missingFields.Any();
             }
             catch
             {
@@ -94,20 +99,19 @@ namespace CKxlsxLib.Reader
 
         #region Events
         //=================================================
-        public event EventHandler OnValidationFailure;
+        public event EventHandler<CKxlsxLibEventArgs> OnValidationFailure;
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public override System.Collections.Generic.IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null,EventHandler OnValidationFailure = null)
+        public override System.Collections.Generic.IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null)
         {
             var sheets = SheetIDs == null ? doc.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : doc.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => SheetIDs.Contains(x.SheetId.Value)).ToArray();
             foreach (var sheet in doc.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(doc.WorkbookPart.GetIdOfPart(x))))
             {
                 if (!isValid<T>(sheet))
                 {
-                    if (OnValidationFailure!= null) OnValidationFailure(this, new EventArgs());
                     continue;
                 }
 

@@ -166,7 +166,7 @@ namespace CKxlsxLib.Reader
             return new xlBookReader(doc).ReadToBook();
         }
 
-        public virtual IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler OnValidationFailure = null) where T : IxlCompatible, new()
+        public virtual IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null) where T : IxlCompatible, new()
         {
             var xlArrayReader = new xlArrayReader(doc);
             if (OnValidationFailure != null)
@@ -177,7 +177,7 @@ namespace CKxlsxLib.Reader
             }
         }
 
-        public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler OnValidationFailure = null) where T : IxlCompatible, new()
+        public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null) where T : IxlCompatible, new()
         {
             return this.ReadToEnumerable<T>(SheetIDs, OnValidationFailure).ToArray();
         }
