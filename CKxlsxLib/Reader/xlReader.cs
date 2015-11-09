@@ -118,7 +118,7 @@ namespace CKxlsxLib.Reader
             }
         }
 
-        protected Tuple<string, xlContentType?, object, int?> ReadCell(Cell item)
+        protected CellInfo ReadCell(Cell item)
         {
             string Reference = string.Empty;
             object Value = null;
@@ -149,7 +149,7 @@ namespace CKxlsxLib.Reader
                         Value = ConvertTypelessCell(item);
                         break;
                 }
-                return new Tuple<string, xlContentType?, object, int?>(Reference, Type, Value, RefId);
+                return new CellInfo(Reference, Type, Value, RefId);
             }
             catch (Exception ex)
             {
@@ -166,20 +166,22 @@ namespace CKxlsxLib.Reader
             return new xlBookReader(doc).ReadToBook();
         }
 
-        public virtual IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null) where T : IxlCompatible, new()
+        public virtual IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError = null) where T : IxlCompatible, new()
         {
             var xlArrayReader = new xlArrayReader(doc);
             if (OnValidationFailure != null)
                 xlArrayReader.OnValidationFailure += OnValidationFailure;
-            foreach (var item in xlArrayReader.ReadToEnumerable<T>(SheetIDs, OnValidationFailure))
+            if (OnCellReadingError != null)
+                xlArrayReader.OnCellReadingError += OnCellReadingError;
+            foreach (var item in xlArrayReader.ReadToEnumerable<T>(SheetIDs))
             {
                 yield return item;
             }
         }
 
-        public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null) where T : IxlCompatible, new()
+        public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError = null) where T : IxlCompatible, new()
         {
-            return this.ReadToEnumerable<T>(SheetIDs, OnValidationFailure).ToArray();
+            return this.ReadToEnumerable<T>(SheetIDs, OnValidationFailure,OnCellReadingError).ToArray();
         }
         //=================================================
         #endregion

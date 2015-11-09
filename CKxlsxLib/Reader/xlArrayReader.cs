@@ -15,6 +15,7 @@ namespace CKxlsxLib.Reader
             : base(document)
         {
             OnValidationFailure += (s, e) => { };
+            //OnCellReadingError += (s, e) => { };
         }
 
         ~xlArrayReader()
@@ -32,7 +33,7 @@ namespace CKxlsxLib.Reader
             {
                 var captions = GetClassCaptions<T>(true);
                 var cells = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null)
-                    .Select(x => ReadCell(x).Item3.ToString()).ToArray();
+                    .Select(x => ReadCell(x).Value.ToString()).ToArray();
                 var missingFields = captions.Where(x => x.All(y => !cells.Any(z => string.Equals(y, z, StringComparison.CurrentCultureIgnoreCase)))).Select(x => x.First());
                 if (missingFields.Any())
                 {
@@ -46,17 +47,17 @@ namespace CKxlsxLib.Reader
             }
         }
 
-        private Dictionary<string, System.Reflection.PropertyInfo> GetMap<T>(WorksheetPart sheet)
+        private Dictionary<string, MapItem> GetMap<T>(WorksheetPart sheet)
         {
-            var result = new Dictionary<string, System.Reflection.PropertyInfo>();
-            var cells = sheet.Worksheet.Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => ReadCell(x).Item3.ToString()); ;
-            foreach (var p in typeof(T).GetProperties().Where(x => xlFieldAttribute.IsDefined(x, typeof(xlFieldAttribute))).Select(x => new { Propery = x, Attribute = (xlFieldAttribute)Attribute.GetCustomAttribute(x, typeof(xlFieldAttribute)) }))
+            var result = new Dictionary<string, MapItem>();
+            var cells = sheet.Worksheet.Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => ReadCell(x).Value.ToString()); ;
+            foreach (var p in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(xlFieldAttribute))).Select(x => new { Propery = x, Attribute = (xlFieldAttribute)Attribute.GetCustomAttribute(x, typeof(xlFieldAttribute)) }))
             {
                 try
                 {
                     var cell = cells.SingleOrDefault(x => p.Attribute.Captions.Any(y => string.Equals(x.Value, y, StringComparison.CurrentCultureIgnoreCase)));
                     if (cell.Key.HasValue())
-                        result[cell.Key.rReplace(@"^([A-Z]+)\d+", @"$1.+")] = p.Propery;
+                        result[cell.Key.rReplace(@"^([A-Z]+)\d+", @"$1.+")] = new MapItem { Property = p.Propery, Attribute = ((xlFieldAttribute)Attribute.GetCustomAttribute(p.Propery, typeof(xlFieldAttribute))) };
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -66,24 +67,24 @@ namespace CKxlsxLib.Reader
             return result;
         }
 
-        private object ConvertValue(Tuple<string, xlContentType?, object, int?> local, xlContentType destinationType)
+        private object ConvertValue(CellInfo local, xlContentType destinationType)
         {
             try
             {
                 switch (destinationType)
                 {
                     case xlContentType.Boolean:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToBoolean(local.Item3, new System.Globalization.CultureInfo("En"));
+                        return local.ContentType == destinationType ? local.Value : Convert.ToBoolean(local.Value, new System.Globalization.CultureInfo("En"));
                     case xlContentType.Integer:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToInt32(local.Item3, new System.Globalization.CultureInfo("En"));
+                        return local.ContentType == destinationType ? local.Value : Convert.ToInt32(local.Value, new System.Globalization.CultureInfo("En"));
                     case xlContentType.Double:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToDecimal(local.Item3.ToString().rReplace("(?<=\\d)[\\.,](?=\\d)", ","));
+                        return local.ContentType == destinationType ? local.Value : Convert.ToDecimal(local.Value.ToString().rReplace("(?<=\\d)[\\.,](?=\\d)", ","));
                     case xlContentType.SharedString:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToString(local.Item3, new System.Globalization.CultureInfo("En"));
+                        return local.ContentType == destinationType ? local.Value : Convert.ToString(local.Value, new System.Globalization.CultureInfo("En"));
                     case xlContentType.String:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToString(local.Item3, new System.Globalization.CultureInfo("En"));
+                        return local.ContentType == destinationType ? local.Value : Convert.ToString(local.Value, new System.Globalization.CultureInfo("En"));
                     case xlContentType.Date:
-                        return local.Item2 == destinationType ? local.Item3 : Convert.ToDateTime(local.Item3);
+                        return local.ContentType == destinationType ? local.Value : Convert.ToDateTime(local.Value);
                     //return local.Item2 == destinationType ? local.Item3 : Convert.ToDateTime(local.Item3, new System.Globalization.CultureInfo("En"));
                     default:
                         throw new ArgumentException("Произошла ошибка при конвертировании ячеек, тип ячейки не распознан");
@@ -100,12 +101,13 @@ namespace CKxlsxLib.Reader
         #region Events
         //=================================================
         public event EventHandler<CKxlsxLibEventArgs> OnValidationFailure;
+        public event EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError;
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public override System.Collections.Generic.IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null)
+        public override IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> ValidationFailureEvent = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> CellReadingErrorEvent = null)
         {
             var sheets = SheetIDs == null ? doc.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : doc.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => SheetIDs.Contains(x.SheetId.Value)).ToArray();
             foreach (var sheet in doc.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(doc.WorkbookPart.GetIdOfPart(x))))
@@ -123,7 +125,15 @@ namespace CKxlsxLib.Reader
                     {
                         foreach (var cell in row.Descendants<Cell>().Where(x => map.Keys.Any(y => x.CellReference.Value.rIsMatch(y))).Select(x => new { Reference = x.CellReference.Value.rReplace(@"^([A-Z]+)\d+", @"$1.+"), Value = ReadCell(x) }))
                         {
-                            map[cell.Reference].SetValue(tmpRes, ConvertValue(cell.Value, ((xlFieldAttribute)Attribute.GetCustomAttribute(map[cell.Reference], typeof(xlFieldAttribute))).ContentType));
+                            try
+                            {
+                                map[cell.Reference].Property.SetValue(tmpRes, ConvertValue(cell.Value, map[cell.Reference].Attribute.ContentType));
+                            }
+                            catch (Exception ex)
+                            {
+                                this.OnCellReadingError(this, new CKxlsxLibCellReadingErrorEventArgs { Reference = cell.Reference, SourceType = cell.Value.ContentType, OutputType = map[cell.Reference].Attribute.ContentType, Value = cell.Value.Value, Exception = ex });
+                                throw;
+                            }
                         }
                     }
                     catch

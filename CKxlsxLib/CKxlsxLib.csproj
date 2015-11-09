@@ -41,9 +41,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MapItem.cs" />
     <Compile Include="Book\xlBook.cs" />
     <Compile Include="Book\xlCell.cs" />
     <Compile Include="Book\xlSheet.cs" />
+    <Compile Include="CellInfo.cs" />
+    <Compile Include="CKxlsxLibCellReadingErrorEventArgs.cs" />
     <Compile Include="CKxlsxLibEventArgs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="OpenXmlValidationException.cs" />

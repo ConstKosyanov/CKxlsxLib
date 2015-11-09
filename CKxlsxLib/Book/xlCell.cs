@@ -75,17 +75,6 @@ namespace CKxlsxLib.Book
         {
             get
             {
-                //int m;
-                //string name = string.Empty;
-                //int col = column;
-                //while (col > 0)
-                //{
-                //    m = (col - 1) % 26;
-                //    name = (char)(65 + m) + name;
-                //    col = (int)((col - m) / 26);
-                //}
-                //return name + row;
-
                 return GetReference(column, row);
             }
             set
@@ -110,20 +99,20 @@ namespace CKxlsxLib.Book
 
         #region Methods
         //=================================================
-        public static implicit operator xlCell(Tuple<string, xlContentType?, object, int?> local)
+        public static implicit operator xlCell(CellInfo local)
         {
             return new xlCell()
             {
-                Reference = local.Item1,
-                Type = local.Item2,
-                Value = local.Item3,
-                SharedId = local.Item4
+                Reference = local.Reference,
+                Type = local.ContentType,
+                Value = local.Value,
+                SharedId = local.SharedId
             };
         }
 
-        public static implicit operator Tuple<string, xlContentType?, object, int?>(xlCell local)
+        public static implicit operator CellInfo(xlCell local)
         {
-            return new Tuple<string, xlContentType?, object, int?>(local.Reference, local.Type, local.Value, local.SharedId);
+            return new CellInfo(local.Reference, local.Type, local.Value, local.SharedId);
         }
         //=================================================
         #endregion
