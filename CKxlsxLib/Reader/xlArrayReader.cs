@@ -67,7 +67,7 @@ namespace CKxlsxLib.Reader
             return result;
         }
 
-        private object ConvertValue(CellInfo local, xlContentType destinationType)
+        private object ConvertValue(CellInfo local, xlContentType destinationType, bool Nullable)
         {
             try
             {
@@ -92,7 +92,10 @@ namespace CKxlsxLib.Reader
             }
             catch (Exception ex)
             {
-                throw new InvalidCastException("Ошбика преобразования ячеек", ex);
+                if (Nullable)
+                    return null;
+                else
+                    throw new InvalidCastException("Ошбика преобразования ячеек", ex);
             }
         }
         //=================================================
@@ -127,16 +130,16 @@ namespace CKxlsxLib.Reader
                         {
                             try
                             {
-                                map[cell.Reference].Property.SetValue(tmpRes, ConvertValue(cell.Value, map[cell.Reference].Attribute.ContentType));
+                                map[cell.Reference].Property.SetValue(tmpRes, ConvertValue(cell.Value, map[cell.Reference].Attribute.ContentType, (map[cell.Reference].Property.PropertyType.IsGenericType && map[cell.Reference].Property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))));
                             }
                             catch (Exception ex)
                             {
-                                this.OnCellReadingError(this, new CKxlsxLibCellReadingErrorEventArgs { Reference = cell.Reference, SourceType = cell.Value.ContentType, OutputType = map[cell.Reference].Attribute.ContentType, Value = cell.Value.Value, Exception = ex });
+                                OnCellReadingError(this, new CKxlsxLibCellReadingErrorEventArgs { Reference = cell.Reference, SourceType = cell.Value.ContentType, OutputType = map[cell.Reference].Attribute.ContentType, Value = cell.Value.Value, Exception = ex });
                                 throw;
                             }
                         }
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         continue;
                     }
@@ -162,7 +165,7 @@ namespace CKxlsxLib.Reader
             };
 
             return typeof(T).GetProperties()
-                .Where(x => xlFieldAttribute.IsDefined(x, typeof(xlFieldAttribute)) && !(requiredOnly && (isNullable(x) || !isRequired(x))))
+                .Where(x => Attribute.IsDefined(x, typeof(xlFieldAttribute)) && !(requiredOnly && (isNullable(x) || !isRequired(x))))
                 .Select(x => ((xlFieldAttribute)Attribute.GetCustomAttribute(x, typeof(xlFieldAttribute))).Captions.ToArray())
                 .ToArray();
         }
