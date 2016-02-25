@@ -35,7 +35,7 @@ namespace ExcelReaderUnitTestProject
         [TestMethod]
         public void Write()
         {
-            var err = xlWriter.Create(data).SaveToFile(path);
+            var err = xlWriter.Create(data).SaveToFile(path);            
             if (err.Count() > 0)
                 Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
         }
@@ -45,7 +45,7 @@ namespace ExcelReaderUnitTestProject
         {
             Write();
             var readedData = xlReader.FromFile(path).ReadToEnumerable<TestExcelClass>().ToArray();
-            Assert.AreEqual(data.Count(), readedData.Count(), "Количество загруженных строк не совпадает");
+            Assert.AreEqual(data.Count(), readedData.Count(),"Количество загруженных строк не совпадает");
             for (int i = 0; i < data.Count(); i++)
             {
                 Assert.AreEqual(data[i].intProperty1, readedData[i].intProperty1, "Поля заполены не верно");
@@ -56,33 +56,22 @@ namespace ExcelReaderUnitTestProject
         }
 
         [TestMethod]
-        public void ReadToArrayWithoutNullableColumns()
+        public void ReadToArrayWithoutNullableColumn()
         {
             var book = new xlBook();
             var sh = book.AddSheet("sheet1");
-
-            #region Captions
-            //=================================================
             sh.AddCell("Поле 1", "A1", xlContentType.SharedString);
             sh.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
             sh.AddCell("Мультизагаловок2", "C1", xlContentType.SharedString);
             sh.AddCell("дробь", "E1", xlContentType.SharedString);
-            //=================================================
-            #endregion
-
-            #region Data
-            //=================================================
             sh.AddCell(1, "A2", xlContentType.Integer);
             sh.AddCell(DateTime.Now, "B2", xlContentType.Date);
             sh.AddCell("Какая-то строка", "C2", xlContentType.SharedString);
             sh.AddCell("0.15", "E2", xlContentType.Double);
-
             sh.AddCell(2, "A3", xlContentType.Integer);
             sh.AddCell(DateTime.Now, "B3", xlContentType.Date);
             sh.AddCell("Какая-то строка", "C3", xlContentType.SharedString);
             sh.AddCell("0.25", "E3", xlContentType.Double);
-            //=================================================
-            #endregion
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
@@ -92,46 +81,7 @@ namespace ExcelReaderUnitTestProject
         }
 
         [TestMethod]
-        public void ReadToArrayWithNullableColumns()
-        {
-            var book = new xlBook();
-            var sh = book.AddSheet("sheet1");
-
-            #region Captions
-            //=================================================
-            sh.AddCell("Поле 1", "A1", xlContentType.SharedString);
-            sh.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
-            sh.AddCell("Мультизагаловок2", "C1", xlContentType.SharedString);
-            sh.AddCell("дробь", "E1", xlContentType.SharedString);
-            sh.AddCell("Поле 3", "F1", xlContentType.SharedString);
-            //=================================================
-            #endregion
-
-            #region Data
-            //=================================================
-            sh.AddCell(1, "A2", xlContentType.SharedString);
-            sh.AddCell(DateTime.Now, "B2", xlContentType.Date);
-            sh.AddCell("Какая-то строка", "C2", xlContentType.SharedString);
-            sh.AddCell("0.15", "E2", xlContentType.Double);
-            sh.AddCell("", "F2", xlContentType.SharedString);
-
-            sh.AddCell(2, "A3", xlContentType.Integer);
-            sh.AddCell(DateTime.Now, "B3", xlContentType.Date);
-            sh.AddCell("Какая-то строка", "C3", xlContentType.SharedString);
-            sh.AddCell("0.25", "E3", xlContentType.Double);
-            sh.AddCell("", "F3", xlContentType.SharedString);
-            //=================================================
-            #endregion
-
-            var memstream = new MemoryStream();
-            xlWriter.Create(book).SaveToStream(memstream);
-
-            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnCellReadingError: (s, e) => { throw new Exception(e.Exception.Message); });
-            Assert.AreEqual(2, data.Count());
-            Assert.IsTrue(data.All(x => !x.intProperty3.HasValue));
-        }
-
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void MultiCaptionTest()
         {
             var book = new xlBook();
@@ -160,7 +110,7 @@ namespace ExcelReaderUnitTestProject
         }
 
         [TestMethod]
-        public void EventTest()
+        public void EverntTest()
         {
             var book = new xlBook();
             var sh = book.AddSheet("sheet1");
@@ -181,7 +131,7 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnValidationFailure: (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); });
+            xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnValidationFailure: (s, e) => { if (!e.MissingFields.Contains("Поле 1"))Assert.Fail(); });
             TestExcelClass[] data = xlReader.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
         }
     }

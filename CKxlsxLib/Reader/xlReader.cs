@@ -114,7 +114,7 @@ namespace CKxlsxLib.Reader
             }
             else
             {
-                return (item.CellValue != null && !string.IsNullOrWhiteSpace(item.CellValue.Text)) ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
+                return item.CellValue != null ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
             }
         }
 
@@ -181,7 +181,7 @@ namespace CKxlsxLib.Reader
 
         public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError = null) where T : IxlCompatible, new()
         {
-            return ReadToEnumerable<T>(SheetIDs, OnValidationFailure,OnCellReadingError).ToArray();
+            return this.ReadToEnumerable<T>(SheetIDs, OnValidationFailure,OnCellReadingError).ToArray();
         }
         //=================================================
         #endregion
