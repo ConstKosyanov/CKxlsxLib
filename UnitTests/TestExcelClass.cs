@@ -7,8 +7,10 @@ namespace ExcelReaderUnitTestProject
     {
         [xlField(xlContentType.Integer, "Поле 1")]
         public int intProperty1 { get; set; }
-        [xlField(xlContentType.Integer, "Поле 2")]
+        [xlField(xlContentType.Integer, false, "Поле 2")]
         public int? intProperty2 { get; set; }
+        [xlField(xlContentType.Integer, false, "Поле 3")]
+        public int? intProperty3 { get; set; }
         [xlField(xlContentType.Double,"дробь")]
         public decimal decimalProperty { get; set; }
         [xlField(xlContentType.Date, "Какая-то дата")]
