@@ -139,7 +139,7 @@ namespace CKxlsxLib.Reader
                             }
                         }
                     }
-                    catch(Exception ex)
+                    catch
                     {
                         continue;
                     }
