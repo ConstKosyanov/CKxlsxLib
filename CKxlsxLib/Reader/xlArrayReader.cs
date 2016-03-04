@@ -71,6 +71,9 @@ namespace CKxlsxLib.Reader
         {
             try
             {
+                if ((local.Value == null) && Nullable)
+                    return null;
+
                 switch (destinationType)
                 {
                     case xlContentType.Boolean:
@@ -92,10 +95,8 @@ namespace CKxlsxLib.Reader
             }
             catch (Exception ex)
             {
-                if (Nullable)
-                    return null;
-                else
-                    throw new InvalidCastException("Ошбика преобразования ячеек", ex);
+                if (Nullable) return null;
+                throw new InvalidCastException("Ошбика преобразования ячеек", ex);
             }
         }
         //=================================================
