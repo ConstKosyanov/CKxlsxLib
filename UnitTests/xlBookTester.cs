@@ -1,11 +1,12 @@
-﻿using CKxlsxLib;
-using CKxlsxLib.Excel;
-using CKxlsxLib.Reader;
-using CKxlsxLib.Writer;
+﻿using qXlsxLib;
+using qXlsxLib.Excel;
+using qXlsxLib.Reader;
+using qXlsxLib.Writer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Linq;
+using qXlsxLib.Utility;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -66,14 +67,14 @@ namespace ExcelReaderUnitTestProject
             ReadBook(xl.Name);
             Assert.AreEqual(2, xl.Sheets.Count(), "Количество листов не совпадает");
             Assert.AreEqual(list1, xl[1].Name, "Имя листа прочитано не верно");
-            Assert.AreEqual("Test", xl[1][1, 1].Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
-            Assert.AreEqual("Test2", xl[1][1, 2].Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
-            Assert.AreEqual("Test", xl[1][2, 1].Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
-            Assert.AreEqual("Test3", xl[1][2, 2].Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
+            Assert.AreEqual("Test", xl[1].Get(1, 1).Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
+            Assert.AreEqual("Test2", xl[1].Get(1, 2).Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
+            Assert.AreEqual("Test", xl[1].Get(2, 1).Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
+            Assert.AreEqual("Test3", xl[1].Get(2, 2).Value.ToString(), "Чтение из SharedStringTable реализовано не верно");
 
-            Assert.AreEqual(Convert.ToDecimal(1), xl[0][1, 1].Value, "Чтение даты реализовано не верно");
-            Assert.AreEqual(DateTime.Today, ((DateTime)xl[0][1, 2].Value).Date, "Чтение даты реализовано не верно");
-            Assert.AreEqual((Decimal)3.14, xl[0][1, 3].Value, "Чтение даты реализовано не верно");
+            Assert.AreEqual(Convert.ToDecimal(1), xl[0].Get(1, 1).Value, "Чтение даты реализовано не верно");
+            Assert.AreEqual(DateTime.Today, ((DateTime)xl[0].Get(1, 2).Value).Date, "Чтение даты реализовано не верно");
+            Assert.AreEqual((decimal)3.14, xl[0].Get(1, 3).Value, "Чтение даты реализовано не верно");
         }
 
         [TestMethod]
@@ -118,11 +119,11 @@ namespace ExcelReaderUnitTestProject
             {
                 using (var file = File.Open(path, FileMode.Open))
                 {
-                    var streamReader = xlReader.FromStream(file);
+                    var streamReader = qXlsx.FromStream(file);
                     xl = streamReader.ReadToBook();
                 }
 
-                var fileReader = xlReader.FromFile(path);
+                var fileReader = qXlsx.FromFile(path);
                 xl = fileReader.ReadToBook();
             }
             catch (Exception ex) { Assert.Fail(string.Format("Ошибка чтения\n{0}", ex.Message)); }

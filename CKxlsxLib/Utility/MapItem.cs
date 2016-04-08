@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using qXlsxLib.Utility;
+using System.Collections.Generic;
 
-namespace CKxlsxLib
+namespace qXlsxLib.Utility
 {
     internal class MapItem
     {

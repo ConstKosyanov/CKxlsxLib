@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CKxlsxLib
+namespace qXlsxLib.Utility.Events
 {
-    public class CKxlsxLibEventArgs : EventArgs
+    public class SheetValidationErrorEventArgs : EventArgs
     {
         #region Constructor
         //=================================================
-        public CKxlsxLibEventArgs(IEnumerable<string> args)
+        public SheetValidationErrorEventArgs(IEnumerable<string> args)
         {
             MissingFields = new List<string>();
             MissingFields.AddRange(args);

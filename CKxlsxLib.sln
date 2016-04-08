@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CKxlsxLib", "CKxlsxLib\CKxlsxLib.csproj", "{018F06A0-666A-4543-A3F0-546A7F68600F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qXlsxLib", "CKxlsxLib\qXlsxLib.csproj", "{018F06A0-666A-4543-A3F0-546A7F68600F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{3A606B1C-3C39-4EFA-B785-4DABBBECA4E8}"
 EndProject

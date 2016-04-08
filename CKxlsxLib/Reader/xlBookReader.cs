@@ -1,11 +1,11 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using CKxlsxLib.Book;
+using qXlsxLib.Book;
 using System;
 using System.Linq;
-using CKxlsxLib.Excel;
+using qXlsxLib.Excel;
 
-namespace CKxlsxLib.Reader
+namespace qXlsxLib.Reader
 {
     internal class xlBookReader : xlReader
     {
@@ -22,17 +22,12 @@ namespace CKxlsxLib.Reader
         {
             result = new xlBook();
         }
-
-        ~xlBookReader()
-        {
-
-        }
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public override xlBook ReadToBook()
+        public xlBook ReadToBook()
         {
             for (int i = 0; i < doc.WorkbookPart.WorksheetParts.Count(); i++)
             {

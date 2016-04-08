@@ -1,10 +1,12 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using qXlsxLib.Utility;
+using qXlsxLib.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CKxlsxLib.Writer
+namespace qXlsxLib.Writer
 {
     internal class xlArrayWriter<T> : xlWriter
     {
@@ -21,11 +23,6 @@ namespace CKxlsxLib.Writer
         public xlArrayWriter(IEnumerable<T> items)
         {
             this.items = items.ToArray();
-        }
-
-        ~xlArrayWriter()
-        {
-
         }
         //=================================================
         #endregion

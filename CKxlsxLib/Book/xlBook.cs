@@ -1,9 +1,10 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
-using CKxlsxLib.Book;
+using qXlsxLib.Book;
+using qXlsxLib.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 
-namespace CKxlsxLib.Excel
+namespace qXlsxLib.Excel
 {
     public class xlBook
     {

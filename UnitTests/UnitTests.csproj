@@ -60,13 +60,16 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestExcelClass.cs" />
+    <Compile Include="UnnamedFieldTester.cs" />
     <Compile Include="WriterTester.cs" />
     <Compile Include="xlClassImportTester.cs" />
     <Compile Include="xlCellTester.cs" />
@@ -74,9 +77,9 @@
     <Compile Include="xlSheetTester.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CKxlsxLib\CKxlsxLib.csproj">
+    <ProjectReference Include="..\CKxlsxLib\qXlsxLib.csproj">
       <Project>{018f06a0-666a-4543-a3f0-546a7f68600f}</Project>
-      <Name>CKxlsxLib</Name>
+      <Name>qXlsxLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

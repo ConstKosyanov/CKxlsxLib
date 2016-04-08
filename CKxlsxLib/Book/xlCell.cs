@@ -1,8 +1,9 @@
-﻿using System;
+﻿using qXlsxLib.Utility;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace CKxlsxLib.Book
+namespace qXlsxLib.Book
 {
     public class xlCell
     {
@@ -15,11 +16,6 @@ namespace CKxlsxLib.Book
         #region Constructor
         //=================================================
         internal xlCell()
-        {
-
-        }
-
-        ~xlCell()
         {
 
         }

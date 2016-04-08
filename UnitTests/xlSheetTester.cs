@@ -1,9 +1,10 @@
-﻿using CKxlsxLib;
-using CKxlsxLib.Book;
-using CKxlsxLib.Excel;
+﻿using qXlsxLib;
+using qXlsxLib.Book;
+using qXlsxLib.Excel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using qXlsxLib.Utility;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -31,7 +32,7 @@ namespace ExcelReaderUnitTestProject
         [ExpectedException(typeof(IndexOutOfRangeException))]
         public void FalseCellIndex()
         {
-            var tmp = xs[0, 0];
+            var tmp = xs.Get(0, 0);
         }
 
         [TestMethod]

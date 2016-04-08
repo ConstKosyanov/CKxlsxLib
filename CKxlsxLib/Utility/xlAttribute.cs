@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using qXlsxLib.Utility.Extensions;
 
-namespace CKxlsxLib
+namespace qXlsxLib.Utility
 {
     public interface IxlCompatible { }
 
@@ -18,14 +18,7 @@ namespace CKxlsxLib
             Captions = new List<string>();
         }
 
-        public xlFieldAttribute(xlContentType contentType, bool isRequired, params string[] captions)
-            : this(contentType, isRequired)
-        {
-            foreach (var item in captions)
-            {
-                Captions.Add(item);
-            }
-        }
+        public xlFieldAttribute(xlContentType contentType, bool isRequired, params string[] captions) : this(contentType, isRequired) { captions.ForEach(Captions.Add); }
         public xlFieldAttribute(xlContentType contentType, bool isRequired, string caption) : this(contentType, isRequired, new string[] { caption }) { }
         public xlFieldAttribute(xlContentType contentType, params string[] captions) : this(contentType, true, captions) { }
         public xlFieldAttribute(bool isRequired, string caption) : this(xlContentType.SharedString, isRequired, caption) { }

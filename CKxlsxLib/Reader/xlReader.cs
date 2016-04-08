@@ -1,12 +1,15 @@
-﻿using CKxlsxLib.Excel;
+﻿using qXlsxLib.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using qXlsxLib.Utility;
+using qXlsxLib.Utility.Events;
+using qXlsxLib.Utility.Extensions;
 
-namespace CKxlsxLib.Reader
+namespace qXlsxLib.Reader
 {
     public class xlReader : IDisposable
     {
@@ -161,28 +164,7 @@ namespace CKxlsxLib.Reader
 
         #region Methods
         //=================================================
-        public virtual xlBook ReadToBook()
-        {
-            return new xlBookReader(doc).ReadToBook();
-        }
-
-        public virtual IEnumerable<T> ReadToEnumerable<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError = null) where T : IxlCompatible, new()
-        {
-            var xlArrayReader = new xlArrayReader(doc);
-            if (OnValidationFailure != null)
-                xlArrayReader.OnValidationFailure += OnValidationFailure;
-            if (OnCellReadingError != null)
-                xlArrayReader.OnCellReadingError += OnCellReadingError;
-            foreach (var item in xlArrayReader.ReadToEnumerable<T>(SheetIDs))
-            {
-                yield return item;
-            }
-        }
-
-        public virtual T[] ReadToArray<T>(uint[] SheetIDs = null, EventHandler<CKxlsxLibEventArgs> OnValidationFailure = null, EventHandler<CKxlsxLibCellReadingErrorEventArgs> OnCellReadingError = null) where T : IxlCompatible, new()
-        {
-            return ReadToEnumerable<T>(SheetIDs, OnValidationFailure,OnCellReadingError).ToArray();
-        }
+        public virtual xlBook ReadToBook() => new xlBookReader(doc).ReadToBook();
         //=================================================
         #endregion
     }

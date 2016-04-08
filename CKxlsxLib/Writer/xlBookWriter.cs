@@ -1,10 +1,10 @@
-﻿using CKxlsxLib.Excel;
+﻿using qXlsxLib.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CKxlsxLib.Writer
+namespace qXlsxLib.Writer
 {
     class xlBookWriter : xlWriter
     {
@@ -20,16 +20,6 @@ namespace CKxlsxLib.Writer
         {
             _xlBook = book;
         }
-
-        #region Destructor
-        //=================================================
-        ~xlBookWriter()
-        {
-
-        }
-        //=================================================
-        #endregion
-
         //=================================================
         #endregion
 

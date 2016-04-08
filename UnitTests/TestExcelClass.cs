@@ -1,4 +1,5 @@
-﻿using CKxlsxLib;
+﻿using qXlsxLib;
+using qXlsxLib.Utility;
 using System;
 
 namespace ExcelReaderUnitTestProject
@@ -11,7 +12,7 @@ namespace ExcelReaderUnitTestProject
         public int? intProperty2 { get; set; }
         [xlField(xlContentType.Integer, false, "Поле 3")]
         public int? intProperty3 { get; set; }
-        [xlField(xlContentType.Double,"дробь")]
+        [xlField(xlContentType.Double, "дробь")]
         public decimal decimalProperty { get; set; }
         [xlField(xlContentType.Date, "Какая-то дата")]
         public DateTime SomeDate { get; set; }
@@ -19,5 +20,7 @@ namespace ExcelReaderUnitTestProject
         public string SomeString { get; set; }
         [xlField(xlContentType.SharedString, "Мультизагаловок1", "Мультизагаловок2")]
         public string MultiCaption { get; set; }
+        [xlField(xlContentType.SharedString, false, "GuidField")]
+        public Guid Guid { get; set; }
     }
 }

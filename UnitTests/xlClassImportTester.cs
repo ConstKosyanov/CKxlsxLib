@@ -1,11 +1,12 @@
-﻿using CKxlsxLib;
-using CKxlsxLib.Excel;
-using CKxlsxLib.Reader;
-using CKxlsxLib.Writer;
+﻿using qXlsxLib;
+using qXlsxLib.Excel;
+using qXlsxLib.Reader;
+using qXlsxLib.Writer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Linq;
+using qXlsxLib.Utility;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -44,7 +45,7 @@ namespace ExcelReaderUnitTestProject
         public void Read()
         {
             Write();
-            var readedData = xlReader.FromFile(path).ReadToEnumerable<TestExcelClass>().ToArray();
+            var readedData = qXlsx.FromFile(path).ReadToEnumerable<TestExcelClass>().ToArray();
             Assert.AreEqual(data.Count(), readedData.Count(), "Количество загруженных строк не совпадает");
             for (int i = 0; i < data.Count(); i++)
             {
@@ -86,7 +87,7 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            TestExcelClass[] data = qXlsx.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty2.HasValue));
         }
@@ -126,7 +127,7 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnCellReadingError: (s, e) => { throw new Exception(e.Exception.Message); });
+            TestExcelClass[] data = qXlsx.FromStream(memstream, new qXlsxConfiguration { CellReadingErrorEvent = (s, e) => { throw new Exception(e.Exception.Message); } }).ReadToArray<TestExcelClass>();
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty3.HasValue));
         }
@@ -154,7 +155,7 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            TestExcelClass[] data = qXlsx.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty2.HasValue));
         }
@@ -181,8 +182,8 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            xlReader.FromStream(memstream).ReadToArray<TestExcelClass>(OnValidationFailure: (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); });
-            TestExcelClass[] data = xlReader.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            qXlsx.FromStream(memstream, new qXlsxConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
+            TestExcelClass[] data = qXlsx.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
         }
     }
 }

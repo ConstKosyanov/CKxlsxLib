@@ -1,8 +1,9 @@
-﻿using CKxlsxLib;
-using CKxlsxLib.Book;
-using CKxlsxLib.Excel;
+﻿using qXlsxLib;
+using qXlsxLib.Book;
+using qXlsxLib.Excel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using qXlsxLib.Utility;
 
 namespace ExcelReaderUnitTestProject
 {

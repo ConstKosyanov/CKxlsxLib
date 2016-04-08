@@ -1,4 +1,4 @@
-﻿using CKxlsxLib.Excel;
+﻿using qXlsxLib.Excel;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -7,10 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using qXlsxLib.Utility;
+using qXlsxLib.Utility.Extensions;
 
-namespace CKxlsxLib.Writer
+namespace qXlsxLib.Writer
 {
-    public abstract class xlWriter
+    public abstract class xlWriter : IxlWriter
     {
         #region Variables
         //=================================================
@@ -304,16 +306,13 @@ namespace CKxlsxLib.Writer
         public ValidationErrorInfo[] SaveToStream(System.IO.Stream stream)
         {
             sst = new Dictionary<string, int>();
-            using (var doc = DocumentFormat.OpenXml.Packaging.SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
+            using (var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
             {
                 IntiWorkbook(doc);
-                GetSheets().ForEach((x) =>
-                {
-                    fillSheet(InitWorksheetPart(doc, x), x);
-                });
+                GetSheets().ForEach((x) => fillSheet(InitWorksheetPart(doc, x), x));
                 IntiSharedStringTablePart(doc.WorkbookPart.AddNewPart<SharedStringTablePart>());
                 doc.WorkbookPart.Workbook.Save();
-                
+
                 OpenXmlValidator validator = new OpenXmlValidator();
                 return validator.Validate(doc).ToArray();
             }
@@ -330,4 +329,3 @@ namespace CKxlsxLib.Writer
         #endregion
     }
 }
-

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using qXlsxLib.Utility;
+using qXlsxLib.Utility.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CKxlsxLib.Book
+namespace qXlsxLib.Book
 {
     public class xlSheet
     {
@@ -24,11 +26,6 @@ namespace CKxlsxLib.Book
             : this(Id)
         {
             Name = ListName;
-        }
-
-        ~xlSheet()
-        {
-
         }
         //=================================================
         #endregion
@@ -84,28 +81,22 @@ namespace CKxlsxLib.Book
             }
         }
 
-        public xlCell this[uint col, uint row]
+        public xlCell Get(uint col, uint row)
         {
-            get
-            {
-                xlCell result = Cells.SingleOrDefault(x => x.Row == row && x.Col == col);
-                if (result == null)
-                    throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0},{1}] не найдена", row, col));
-                else
-                    return result;
-            }
+            xlCell result = Cells.SingleOrDefault(x => x.Row == row && x.Col == col);
+            if (result == null)
+                throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0},{1}] не найдена", row, col));
+            else
+                return result;
         }
 
-        public xlCell this[string Reference]
+        public xlCell Get(string Reference)
         {
-            get
-            {
                 xlCell result = Cells.SingleOrDefault(x => x.Reference == Reference);
                 if (result == null)
                     throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0}] не найдена", Reference));
                 else
                     return result;
-            }
         }
 
         public List<xlCell> Cells { get; set; }
