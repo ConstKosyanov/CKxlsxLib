@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Utility\Map.cs" />
     <Compile Include="qXlsxConfiguration.cs" />
-    <Compile Include="Reader\newxlArrayReader.cs" />
+    <Compile Include="Reader\xlArrayReader.cs" />
     <Compile Include="Utility\DocData.cs" />
     <Compile Include="Utility\MapItem.cs" />
     <Compile Include="Book\xlBook.cs" />
@@ -56,10 +56,8 @@
     <Compile Include="Utility\Extensions\Extensions.cs" />
     <Compile Include="Utility\Exceptions\OpenXmlValidationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reader\xlArrayReader.cs" />
     <Compile Include="Reader\xlBookReader.cs" />
     <Compile Include="Reader\xlReader.cs" />
-    <Compile Include="Writer\IxlWriter.cs" />
     <Compile Include="Writer\xlArrayWriter.cs" />
     <Compile Include="Writer\xlBookWriter.cs" />
     <Compile Include="Writer\xlWriter.cs" />

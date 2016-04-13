@@ -12,7 +12,7 @@ using qXlsxLib.Utility.Extensions;
 
 namespace qXlsxLib.Writer
 {
-    public abstract class xlWriter : IxlWriter
+    public abstract class xlWriter
     {
         #region Variables
         //=================================================
@@ -65,87 +65,6 @@ namespace qXlsxLib.Writer
 
         void InitStylesPart(WorkbookStylesPart stylesPart)
         {
-            #region Raw
-            //=================================================
-            //stylesPart.Stylesheet = new Stylesheet();
-            //stylesPart.Stylesheet.Borders = new Borders();
-            //stylesPart.Stylesheet.CellFormats = new CellFormats();
-            //stylesPart.Stylesheet.CellStyleFormats = new CellStyleFormats();
-            //stylesPart.Stylesheet.CellStyles = new CellStyles();
-            //stylesPart.Stylesheet.Colors = new Colors();
-            //stylesPart.Stylesheet.DifferentialFormats = new DifferentialFormats();
-            //stylesPart.Stylesheet.Fonts = new Fonts();
-            //stylesPart.Stylesheet.Fills = new Fills();
-            //stylesPart.Stylesheet.NumberingFormats = new NumberingFormats();
-            //stylesPart.Stylesheet.StylesheetExtensionList = new StylesheetExtensionList();
-            //stylesPart.Stylesheet.TableStyles = new TableStyles();
-
-            //stylesPart.Stylesheet.Fills.Append(new Fill());
-            //stylesPart.Stylesheet.CellStyles.Append(new CellStyle() { FormatId = 0 });
-            //stylesPart.Stylesheet.CellStyles.Append(new CellStyle() { FormatId = 1 });
-            //stylesPart.Stylesheet.CellStyles.Append(new CellStyle() { FormatId = 2 });
-            //stylesPart.Stylesheet.CellStyleFormats.Append(new CellFormat());
-            //stylesPart.Stylesheet.CellStyleFormats.Append(new CellFormat());
-            //stylesPart.Stylesheet.CellStyleFormats.Append(new CellFormat());
-            //stylesPart.Stylesheet.CellFormats.Append(new CellFormat());
-            //stylesPart.Stylesheet.CellFormats.Append(new CellFormat());
-            //stylesPart.Stylesheet.CellFormats.Append(new CellFormat());
-            //=================================================
-            #endregion
-
-            #region Shit
-            //=================================================
-            ////#region Fonts
-            //////=================================================
-            ////stylesPart.Stylesheet.Fonts = new Fonts() { Count = 1 };
-            ////stylesPart.Stylesheet.Fonts.AppendChild(new Font() { FontName = new FontName() { Val = new StringValue("Calibri") }, FontSize = new FontSize() { Val = 11 } });
-            //////=================================================
-            ////#endregion
-
-            ////#region Fills
-            //////=================================================
-            ////stylesPart.Stylesheet.Fills = new Fills();
-            ////stylesPart.Stylesheet.Fills.AppendChild(new Fill() { PatternFill = new PatternFill() { PatternType = new EnumValue<PatternValues>(PatternValues.None) } });
-            //////=================================================
-            ////#endregion
-
-            ////#region Borders
-            //////================================================= 
-            ////stylesPart.Stylesheet.Borders = new Borders();
-            ////stylesPart.Stylesheet.Borders.AppendChild(new Border());
-            //////=================================================
-            ////#endregion
-
-            ////#region CellStyleFormats
-            //////=================================================
-            ////stylesPart.Stylesheet.CellStyleFormats = new CellStyleFormats();
-            ////stylesPart.Stylesheet.CellStyleFormats.AppendChild(new CellFormat() { });
-            ////stylesPart.Stylesheet.CellStyleFormats.AppendChild(new CellFormat() { });
-            ////stylesPart.Stylesheet.CellStyleFormats.AppendChild(new CellFormat() { });
-            //////=================================================
-            ////#endregion
-
-            ////#region CellFormats
-            //////=================================================
-            ////stylesPart.Stylesheet.CellFormats = new CellFormats();
-            ////stylesPart.Stylesheet.CellFormats.AppendChild(new CellFormat() { NumberFormatId = 0, FontId = 0, FillId = 0, BorderId = 1, FormatId = 0 });
-            ////stylesPart.Stylesheet.CellFormats.AppendChild(new CellFormat() { NumberFormatId = 14, FontId = 0, FillId = 0, BorderId = 1, FormatId = 1, ApplyNumberFormat = true });
-            ////stylesPart.Stylesheet.CellFormats.AppendChild(new CellFormat() { NumberFormatId = 2, FontId = 0, FillId = 0, BorderId = 1, FormatId = 1, ApplyNumberFormat = true });
-            //////=================================================
-            ////#endregion
-
-            ////#region CellStyles
-            //////=================================================
-            ////stylesPart.Stylesheet.CellStyles = new CellStyles();
-            ////stylesPart.Stylesheet.CellStyles.AppendChild(new CellStyle { Name = "None", FormatId = 1 });
-            ////stylesPart.Stylesheet.CellStyles.AppendChild(new CellStyle { Name = "Обычный", FormatId = 0 , BuiltinId = 0});
-            //////=================================================
-            ////#endregion
-
-            //stylesPart.Stylesheet.Save();
-            //=================================================
-            #endregion
-
             #region Old
             //=================================================
             stylesPart.Stylesheet = new Stylesheet();
@@ -303,7 +222,7 @@ namespace qXlsxLib.Writer
             }
         }
 
-        public ValidationErrorInfo[] SaveToStream(System.IO.Stream stream)
+        public ValidationErrorInfo[] SaveToStream(Stream stream)
         {
             sst = new Dictionary<string, int>();
             using (var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))

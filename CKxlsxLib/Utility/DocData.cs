@@ -8,7 +8,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace qXlsxLib.Utility
 {
-    class DocDictionaries : IDisposable
+    public class DocDictionaries : IDisposable
     {
         private SpreadsheetDocument document;
         public string[] sharedStrings;

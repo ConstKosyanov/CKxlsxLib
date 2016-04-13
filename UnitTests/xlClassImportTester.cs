@@ -131,8 +131,7 @@ namespace ExcelReaderUnitTestProject
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty3.HasValue));
         }
-
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        
         public void MultiCaptionTest()
         {
             var book = new xlBook();
@@ -155,9 +154,11 @@ namespace ExcelReaderUnitTestProject
             var memstream = new MemoryStream();
             xlWriter.Create(book).SaveToStream(memstream);
 
-            TestExcelClass[] data = qXlsx.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            var isValid = true;
+            TestExcelClass[] data = qXlsx.FromStream(memstream, new qXlsxConfiguration { ValidationFailureEvent = (s, e) => isValid = false }).ReadToEnumerable<TestExcelClass>().ToArray();
             Assert.AreEqual(2, data.Count());
             Assert.IsTrue(data.All(x => !x.intProperty2.HasValue));
+            Assert.IsFalse(isValid);
         }
 
         [TestMethod]

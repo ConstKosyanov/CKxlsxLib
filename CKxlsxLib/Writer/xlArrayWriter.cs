@@ -82,11 +82,5 @@ namespace qXlsxLib.Writer
         }
         //=================================================
         #endregion
-
-        #region Properties
-        //=================================================
-        public IEnumerable<System.Reflection.PropertyInfo> Fields { get { return typeof(T).GetProperties().Where(x => xlFieldAttribute.IsDefined(x, typeof(xlFieldAttribute))); } }
-        //=================================================
-        #endregion
     }
 }

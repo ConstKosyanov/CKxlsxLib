@@ -128,7 +128,7 @@ namespace qXlsxLib.Reader
             int? RefId = null;
 
             Reference = item.CellReference.Value;
-            xlContentType? Type = (item.DataType != null ? (DocumentFormat.OpenXml.Spreadsheet.CellValues?)item.DataType.Value : null).ToxlContentType();
+            xlContentType? Type = null;//(item.DataType != null ? (CellValues?)item.DataType.Value : null).ToxlContentType();
             try
             {
                 switch (Type)

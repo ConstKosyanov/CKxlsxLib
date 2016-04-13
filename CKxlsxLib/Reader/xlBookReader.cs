@@ -17,17 +17,13 @@ namespace qXlsxLib.Reader
 
         #region Constructor
         //=================================================
-        internal xlBookReader(SpreadsheetDocument document)
-            : base(document)
-        {
-            result = new xlBook();
-        }
+        internal xlBookReader(SpreadsheetDocument document) : base(document) { result = new xlBook(); }
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public xlBook ReadToBook()
+        public override xlBook ReadToBook()
         {
             for (int i = 0; i < doc.WorkbookPart.WorksheetParts.Count(); i++)
             {
@@ -37,8 +33,7 @@ namespace qXlsxLib.Reader
                 foreach (var cell in worksheetPart.Worksheet.GetFirstChild<SheetData>().Descendants<Cell>())
                 {
                     if (cell == null) { continue; }
-                    var res = ReadCell(cell);
-                    result[i].Cells.Add(res);
+                    result[i].Cells.Add(ReadCell(cell));
                 }
             }
 

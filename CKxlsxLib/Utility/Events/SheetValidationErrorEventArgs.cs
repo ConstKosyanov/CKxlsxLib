@@ -8,20 +8,12 @@ namespace qXlsxLib.Utility.Events
 {
     public class SheetValidationErrorEventArgs : EventArgs
     {
-        #region Constructor
-        //=================================================
-        public SheetValidationErrorEventArgs(IEnumerable<string> args)
+        public SheetValidationErrorEventArgs(IEnumerable<string> missingFields, IEnumerable<Exception> exceptions)
         {
-            MissingFields = new List<string>();
-            MissingFields.AddRange(args);
+            MissingFields = missingFields;
+            Exceptions = exceptions;
         }
-        //=================================================
-        #endregion
-
-        #region Properties
-        //=================================================
-        public List<string> MissingFields { get; set; }
-        //=================================================
-        #endregion
+        public IEnumerable<string> MissingFields { get; set; }
+        public IEnumerable<Exception> Exceptions { get; set; }
     }
 }
