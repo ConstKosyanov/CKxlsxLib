@@ -1,9 +1,9 @@
-﻿using qXlsxLib.Utility;
+﻿using XLOC.Utility;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace qXlsxLib.Utility
+namespace XLOC.Utility
 {
     internal class MapItem
     {

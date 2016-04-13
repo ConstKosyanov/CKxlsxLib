@@ -1,10 +1,10 @@
-﻿using qXlsxLib;
-using qXlsxLib.Excel;
-using qXlsxLib.Writer;
+﻿using XLOC;
+using XLOC.Excel;
+using XLOC.Writer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
-using qXlsxLib.Utility;
+using XLOC.Utility;
 
 namespace ExcelReaderUnitTestProject
 {

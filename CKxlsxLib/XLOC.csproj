@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utility\Map.cs" />
-    <Compile Include="qXlsxConfiguration.cs" />
+    <Compile Include="XLOCConfiguration.cs" />
     <Compile Include="Reader\xlArrayReader.cs" />
     <Compile Include="Utility\DocData.cs" />
     <Compile Include="Utility\MapItem.cs" />
@@ -50,7 +50,7 @@
     <Compile Include="Book\xlCell.cs" />
     <Compile Include="Book\xlSheet.cs" />
     <Compile Include="Utility\CellInfo.cs" />
-    <Compile Include="qXlsx.cs" />
+    <Compile Include="XLOC.cs" />
     <Compile Include="Utility\Events\CellReadingErrorEventArgs.cs" />
     <Compile Include="Utility\Events\SheetValidationErrorEventArgs.cs" />
     <Compile Include="Utility\Extensions\Extensions.cs" />

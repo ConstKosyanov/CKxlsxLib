@@ -1,15 +1,13 @@
-﻿using qXlsxLib.Excel;
-using DocumentFormat.OpenXml.Packaging;
+﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using qXlsxLib.Utility;
-using qXlsxLib.Utility.Events;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Book;
+using XLOC.Utility;
+using XLOC.Utility.Extensions;
 
-namespace qXlsxLib.Reader
+namespace XLOC.Reader
 {
     public class xlReader : IDisposable
     {

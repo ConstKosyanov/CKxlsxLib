@@ -1,10 +1,10 @@
-﻿using qXlsxLib.Utility;
-using qXlsxLib.Utility.Extensions;
+﻿using XLOC.Utility;
+using XLOC.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace qXlsxLib.Book
+namespace XLOC.Book
 {
     public class xlSheet
     {

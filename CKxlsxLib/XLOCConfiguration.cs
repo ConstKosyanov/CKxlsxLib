@@ -1,9 +1,9 @@
-﻿using qXlsxLib.Utility.Events;
+﻿using XLOC.Utility.Events;
 using System;
 
-namespace qXlsxLib
+namespace XLOC
 {
-    public class qXlsxConfiguration
+    public class XLOCConfiguration
     {
         public EventHandler<SheetValidationErrorEventArgs> ValidationFailureEvent { get; set; }
         public EventHandler<CellReadingErrorEventArgs> CellReadingErrorEvent { get; set; }

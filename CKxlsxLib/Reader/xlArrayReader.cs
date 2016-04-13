@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml.Packaging;
-using qXlsxLib.Utility;
-using qXlsxLib.Utility.Events;
+using XLOC.Utility;
+using XLOC.Utility.Events;
 using DocumentFormat.OpenXml.Spreadsheet;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Utility.Extensions;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace qXlsxLib.Reader
+namespace XLOC.Reader
 {
     class xlArrayReader
     {
         #region Var
         //=================================================
-        qXlsxConfiguration _config;
+        XLOCConfiguration _config;
         DocDictionaries docProvider;
         //=================================================
         #endregion
@@ -29,7 +29,7 @@ namespace qXlsxLib.Reader
 
         #region Constructor
         //=================================================
-        public xlArrayReader(qXlsxConfiguration configuration)
+        public xlArrayReader(XLOCConfiguration configuration)
         {
             _config = configuration;
             OnValidationFailure += _config.ValidationFailureEvent;

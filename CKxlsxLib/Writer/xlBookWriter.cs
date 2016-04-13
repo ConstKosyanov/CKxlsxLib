@@ -1,10 +1,10 @@
-﻿using qXlsxLib.Excel;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
 using System.Linq;
+using XLOC.Book;
 
-namespace qXlsxLib.Writer
+namespace XLOC.Writer
 {
     class xlBookWriter : xlWriter
     {

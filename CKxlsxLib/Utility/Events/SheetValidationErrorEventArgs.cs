@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace qXlsxLib.Utility.Events
+namespace XLOC.Utility.Events
 {
     public class SheetValidationErrorEventArgs : EventArgs
     {

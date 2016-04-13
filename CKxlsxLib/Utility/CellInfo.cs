@@ -1,6 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace qXlsxLib.Utility
+namespace XLOC.Utility
 {
     public class CellInfo
     {

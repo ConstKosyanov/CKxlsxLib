@@ -1,9 +1,9 @@
-﻿using qXlsxLib.Utility;
+﻿using XLOC.Utility;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace qXlsxLib.Book
+namespace XLOC.Book
 {
     public class xlCell
     {

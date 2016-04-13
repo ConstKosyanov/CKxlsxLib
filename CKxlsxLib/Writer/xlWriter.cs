@@ -1,5 +1,4 @@
-﻿using qXlsxLib.Excel;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Validation;
@@ -7,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using qXlsxLib.Utility;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Book;
+using XLOC.Utility;
+using XLOC.Utility.Extensions;
 
-namespace qXlsxLib.Writer
+namespace XLOC.Writer
 {
     public abstract class xlWriter
     {

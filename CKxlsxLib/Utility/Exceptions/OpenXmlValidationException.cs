@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 
-namespace qXlsxLib.Utility.Exceptions
+namespace XLOC.Utility.Exceptions
 {
     [Serializable]
     public class OpenXmlValidationException : Exception

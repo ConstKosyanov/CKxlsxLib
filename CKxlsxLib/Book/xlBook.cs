@@ -1,10 +1,8 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using qXlsxLib.Book;
-using qXlsxLib.Utility.Extensions;
+﻿using XLOC.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 
-namespace qXlsxLib.Excel
+namespace XLOC.Book
 {
     public class xlBook
     {

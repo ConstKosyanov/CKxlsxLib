@@ -1,12 +1,12 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
-using qXlsxLib.Utility;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Utility;
+using XLOC.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace qXlsxLib.Writer
+namespace XLOC.Writer
 {
     internal class xlArrayWriter<T> : xlWriter
     {

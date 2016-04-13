@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace qXlsxLib.Utility.Extensions
+namespace XLOC.Utility.Extensions
 {
     internal static class Extensions
     {

@@ -1,5 +1,5 @@
-﻿using qXlsxLib;
-using qXlsxLib.Utility;
+﻿using XLOC;
+using XLOC.Utility;
 using System;
 
 namespace ExcelReaderUnitTestProject

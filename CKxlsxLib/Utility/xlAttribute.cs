@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Utility.Extensions;
 
-namespace qXlsxLib.Utility
+namespace XLOC.Utility
 {
     public interface IxlCompatible { }
 

@@ -1,11 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using qXlsxLib.Book;
-using System;
+using XLOC.Book;
 using System.Linq;
-using qXlsxLib.Excel;
 
-namespace qXlsxLib.Reader
+namespace XLOC.Reader
 {
     internal class xlBookReader : xlReader
     {

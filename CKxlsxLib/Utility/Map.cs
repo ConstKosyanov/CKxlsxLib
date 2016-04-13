@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Linq;
-using qXlsxLib.Utility.Extensions;
+using XLOC.Utility.Extensions;
 using System.Reflection;
 
-namespace qXlsxLib.Utility
+namespace XLOC.Utility
 {
     internal class Map<T> : Dictionary<string, MapItem>
     {

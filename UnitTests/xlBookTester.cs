@@ -1,12 +1,12 @@
-﻿using qXlsxLib;
-using qXlsxLib.Excel;
-using qXlsxLib.Reader;
-using qXlsxLib.Writer;
+﻿using XLOC;
+using XLOC.Excel;
+using XLOC.Reader;
+using XLOC.Writer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Linq;
-using qXlsxLib.Utility;
+using XLOC.Utility;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -119,11 +119,11 @@ namespace ExcelReaderUnitTestProject
             {
                 using (var file = File.Open(path, FileMode.Open))
                 {
-                    var streamReader = qXlsx.FromStream(file);
+                    var streamReader = XLOC.XlConverter.FromStream(file);
                     xl = streamReader.ReadToBook();
                 }
 
-                var fileReader = qXlsx.FromFile(path);
+                var fileReader = XLOC.XlConverter.FromFile(path);
                 xl = fileReader.ReadToBook();
             }
             catch (Exception ex) { Assert.Fail(string.Format("Ошибка чтения\n{0}", ex.Message)); }

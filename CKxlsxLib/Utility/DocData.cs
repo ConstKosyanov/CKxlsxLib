@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace qXlsxLib.Utility
+namespace XLOC.Utility
 {
     public class DocDictionaries : IDisposable
     {

@@ -77,9 +77,9 @@
     <Compile Include="xlSheetTester.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CKxlsxLib\qXlsxLib.csproj">
+    <ProjectReference Include="..\CKxlsxLib\XLOC.csproj">
       <Project>{018f06a0-666a-4543-a3f0-546a7f68600f}</Project>
-      <Name>qXlsxLib</Name>
+      <Name>XLOC</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

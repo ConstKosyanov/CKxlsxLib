@@ -1,12 +1,12 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using qXlsxLib;
-using qXlsxLib.Excel;
+using XLOC;
+using XLOC.Excel;
 using System.IO;
-using qXlsxLib.Writer;
-using qXlsxLib.Reader;
+using XLOC.Writer;
+using XLOC.Reader;
 using System.Linq;
-using qXlsxLib.Utility;
+using XLOC.Utility;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -34,7 +34,7 @@ namespace ExcelReaderUnitTestProject
             var err = xlWriter.Create(book).SaveToStream(memstream);
             Assert.IsFalse(err.Any(), string.Join("\n", err.Select(x => x.Description)));
 
-            var result = qXlsx.FromStream(memstream).ReadToArray<MyClass>();
+            var result = XLOC.XlConverter.FromStream(memstream).ReadToArray<MyClass>();
             Assert.AreEqual(4, result.Count());
             Assert.IsTrue(result.All(x => x.Field == 1));
         }
