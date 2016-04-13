@@ -1,12 +1,9 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using XLOC;
-using XLOC.Excel;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using XLOC.Writer;
-using XLOC.Reader;
 using System.Linq;
+using XLOC.Book;
 using XLOC.Utility;
+using XLOC.Writer;
 
 namespace ExcelReaderUnitTestProject
 {

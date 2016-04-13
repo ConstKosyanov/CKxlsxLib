@@ -1,8 +1,6 @@
-﻿using XLOC;
-using XLOC.Book;
-using XLOC.Excel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using XLOC.Book;
 using XLOC.Utility;
 
 namespace ExcelReaderUnitTestProject
