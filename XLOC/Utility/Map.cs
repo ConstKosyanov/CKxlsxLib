@@ -14,7 +14,8 @@ namespace XLOC.Utility
         //=================================================
         public Map(Dictionary<string, string> dictionary) : base()
         {
-            foreach (var prop in getProperties())
+            var props = getProperties();
+            foreach (var prop in props)
             {
                 try
                 {
@@ -56,7 +57,7 @@ namespace XLOC.Utility
         //=================================================
         public IEnumerable<string> MissingFields { get; set; }
         public List<Exception> Exceptioins { get; set; } = new List<Exception>();
-        public bool IsValid => !MissingFields.Any() || Exceptioins.Any();
+        public bool IsValid => !(MissingFields.Any() || Exceptioins.Any());
         //=================================================
         #endregion
     }

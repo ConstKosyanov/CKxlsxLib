@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utility\Map.cs" />
+    <Compile Include="Utility\SkipModeEnum.cs" />
     <Compile Include="XLOCConfiguration.cs" />
     <Compile Include="Reader\xlArrayReader.cs" />
     <Compile Include="Utility\DocData.cs" />

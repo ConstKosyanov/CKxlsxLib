@@ -9,5 +9,7 @@ namespace XLOC
         public EventHandler<CellReadingErrorEventArgs> CellReadingErrorEvent { get; set; }
         public uint[] Sheets { get; set; }
         public bool ContinueOnRowReadingError { get; set; } = true;
+        public Utility.SkipModeEnum SkipMode { get; set; } = Utility.SkipModeEnum.None;
+        public int? SkipCount { get; set; }
     }
 }

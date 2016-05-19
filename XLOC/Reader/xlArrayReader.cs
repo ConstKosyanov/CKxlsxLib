@@ -33,14 +33,10 @@ namespace XLOC.Reader
         {
             _config = configuration;
             OnValidationFailure += _config.ValidationFailureEvent;
+            OnValidationFailure += (s, e) => { };
             OnCellReadingError += _config.CellReadingErrorEvent;
+            OnCellReadingError += (s, e) => { };
         }
-        //=================================================
-        #endregion
-
-        #region Static
-        //=================================================
-        static IEnumerable<Cell> GetCaptionCells(WorksheetPart sheet) => sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null);
         //=================================================
         #endregion
 
@@ -154,7 +150,8 @@ namespace XLOC.Reader
                 var sheets = _config.Sheets == null ? document.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => _config.Sheets.Contains(x.SheetId.Value)).ToArray();
                 foreach (var sheet in document.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(document.WorkbookPart.GetIdOfPart(x))))
                 {
-                    var map = new Map<T>(GetCaptionCells(sheet).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                    Map<T> map = GetMap<T>(sheet);
+
                     if (!map.IsValid)
                     {
                         OnValidationFailure(this, new SheetValidationErrorEventArgs(map.MissingFields, map.Exceptioins));
@@ -170,6 +167,33 @@ namespace XLOC.Reader
                     }
                 }
             }
+        }
+
+        private Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
+        {
+            switch (_config.SkipMode)
+            {
+                case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                case SkipModeEnum.Auto: return AutoMap<T>(sheet);
+                default: throw new NotImplementedException("Default switch case not implemented");
+            }
+        }
+
+        private Map<T> AutoMap<T>(WorksheetPart sheet)
+        {
+            Map<T> result = null;
+            var enumerator = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().GetEnumerator();
+            while (!(!enumerator.MoveNext() || (result?.IsValid ?? false)))
+            {
+                result = new Map<T>(ToDictionary(enumerator.Current));
+            }
+            return result;
+        }
+
+        private Dictionary<string, string> ToDictionary(Row row)
+        {
+            return row.Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString());
         }
         //=================================================
         #endregion

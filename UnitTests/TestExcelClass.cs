@@ -18,7 +18,7 @@ namespace ExcelReaderUnitTestProject
         public DateTime SomeDate { get; set; }
         [xlField(xlContentType.SharedString, false, "Какая-то строка")]
         public string SomeString { get; set; }
-        [xlField(xlContentType.SharedString, "Мультизагаловок1", "Мультизагаловок2")]
+        [xlField(xlContentType.SharedString, false, "Мультизагаловок1", "Мультизагаловок2")]
         public string MultiCaption { get; set; }
         [xlField(xlContentType.SharedString, false, "GuidField")]
         public Guid Guid { get; set; }
