@@ -12,9 +12,9 @@ namespace XLOC
     {
         public static XLOCReader FromStream(Stream stream, XLOCConfiguration configuration = null) => new XLOCReader { Configuration = configuration ?? new XLOCConfiguration(), Document = SpreadsheetDocument.Open(stream, false) };
 
-        public static XLOCReader FromFile(string path)
+        public static XLOCReader FromFile(string path, XLOCConfiguration configuration = null)
         {
-            try { return FromStream(new MemoryStream(File.ReadAllBytes(path))); }
+            try { return FromStream(new MemoryStream(File.ReadAllBytes(path)), configuration); }
             catch (Exception ex) { throw new IOException(string.Format("Не удалось открыть файл {0}", path), ex); }
         }
     }
