@@ -213,7 +213,7 @@ namespace ExcelReaderUnitTestProject
                 }
 
                 xlWriter.Create(book).SaveToStream(memstream);
-                var conv = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.None });
+                var conv = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.None, SkipCount = 4 });
                 Assert.AreEqual(countShouldBe, conv.ReadToArray<TestExcelClass>().Count());
             }
         }

@@ -101,7 +101,7 @@ namespace XLOC.Reader
                         Reference = cell.CellReference,
                         SourceType = cell.DataType?.Value ?? null,
                         OutputType = map[cell.CellReference.Value.rMatch("^[A-Z]+")].Attribute.ContentType,
-                        Value = cell.CellValue.Text,
+                        Value = cell.CellValue?.Text,
                         Exception = ex
                     });
                     throw;
@@ -158,7 +158,7 @@ namespace XLOC.Reader
                         continue;
                     }
 
-                    foreach (var row in sheet.Worksheet.Descendants<Row>().Skip(1))
+                    foreach (var row in sheet.Worksheet.Descendants<Row>().Skip(getSkip()))
                     {
                         T tmp;
                         try { tmp = RowToObject<T>(row, map); }
@@ -168,6 +168,8 @@ namespace XLOC.Reader
                 }
             }
         }
+
+        int getSkip() => _config.SkipMode == SkipModeEnum.None ? 0 : _config.SkipCount ?? 0;
 
         private Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
         {
@@ -184,9 +186,11 @@ namespace XLOC.Reader
         {
             Map<T> result = null;
             var enumerator = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().GetEnumerator();
+            _config.SkipCount = 0;
             while (!(!enumerator.MoveNext() || (result?.IsValid ?? false)))
             {
                 result = new Map<T>(ToDictionary(enumerator.Current));
+                _config.SkipCount++;
             }
             return result;
         }
