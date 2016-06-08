@@ -16,14 +16,14 @@ namespace ExcelReaderUnitTestProject
 
         TestExcelClass[] data = new TestExcelClass[]
         {
-            new TestExcelClass() { intProperty1 = 1 , SomeDate = DateTime.Now, SomeString = "asdasd"},
-            new TestExcelClass() { intProperty1 = 2 , SomeDate = DateTime.Now, SomeString = "aafgf"},
-            new TestExcelClass() { intProperty1 = 3 , SomeDate = DateTime.Now, SomeString = "xdfe"},
-            new TestExcelClass() { intProperty1 = 4 , SomeDate = DateTime.Now, SomeString = "dfdr"},
-            new TestExcelClass() { intProperty1 = 5 , SomeDate = DateTime.Now, SomeString = "ghdg"},
-            new TestExcelClass() { intProperty1 = 7 , SomeDate = DateTime.Now, SomeString = "dfg"},
-            new TestExcelClass() { intProperty1 = 9 , SomeDate = DateTime.Now, SomeString = "dfgag"},
-            new TestExcelClass() { intProperty1 = 10, SomeDate = DateTime.Now, SomeString = "sdfsw"},
+            new TestExcelClass() { intProperty1 = 1 , intProperty3 = 1 , SomeDate = DateTime.Now, SomeString = "asdasd"},
+            new TestExcelClass() { intProperty1 = 2 , intProperty3 = 2 , SomeDate = DateTime.Now, SomeString = "aafgf"},
+            new TestExcelClass() { intProperty1 = 3 , intProperty3 = 3 , SomeDate = DateTime.Now, SomeString = "xdfe"},
+            new TestExcelClass() { intProperty1 = 4 , intProperty3 = 4 , SomeDate = DateTime.Now, SomeString = "dfdr"},
+            new TestExcelClass() { intProperty1 = 5 , intProperty3 = 5 , SomeDate = DateTime.Now, SomeString = "ghdg"},
+            new TestExcelClass() { intProperty1 = 7 , intProperty3 = 7 , SomeDate = DateTime.Now, SomeString = "dfg"},
+            new TestExcelClass() { intProperty1 = 9 , intProperty3 = 9 , SomeDate = DateTime.Now, SomeString = "dfgag"},
+            new TestExcelClass() { intProperty1 = 10, intProperty3 = 10, SomeDate = DateTime.Now, SomeString = "sdfsw"},
         };
 
         [ClassInitialize]

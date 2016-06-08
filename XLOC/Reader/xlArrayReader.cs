@@ -122,21 +122,55 @@ namespace XLOC.Reader
                     case CellValues.Date:
                         throw new NotImplementedException($"Преобразование для типа {type} не реализовано");
                     case CellValues.Number:
-                        return Convert.ChangeType(cell.CellValue, type);
+                        return ConvertToTypeWitNullableCheck(cell.CellValue, type);
                     case CellValues.SharedString:
                         var RefId = int.Parse(cell.CellValue.Text);
                         return TypeDescriptor.GetConverter(type).ConvertFromString(docProvider.sharedStrings[RefId].HasValue() ? docProvider.sharedStrings[RefId] : string.Empty);
                     case CellValues.String:
                     case CellValues.InlineString:
-                        return Convert.ChangeType(cell.CellValue?.Text, type);
+                        return ConvertToTypeWitNullableCheck(cell.CellValue?.Text, type);
                     default:
-                        return Convert.ChangeType(ConvertTypelessCell(cell), type);
+                        return ConvertToTypeWitNullableCheck(ConvertTypelessCell(cell), type);
                 }
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"Ошибка преобразования ячеек, адрес ссылки [{cell.CellReference}], искходное значение [{cell.CellValue?.Text}], исходный тип [{cell.DataType?.Value}], стиль [{cell.StyleIndex?.Value}]", ex);
             }
+        }
+
+        static object ConvertToTypeWitNullableCheck(object value, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? ConvertNullable(value, type) : Convert.ChangeType(value, type);
+        static object ConvertNullable(object value, Type type) => value != null ? Convert.ChangeType(value, type.GetGenericArguments().First()) : null;
+
+        int getSkip() => _config.SkipMode == SkipModeEnum.None ? 0 : _config.SkipCount ?? 0;
+
+        Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
+        {
+            switch (_config.SkipMode)
+            {
+                case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                case SkipModeEnum.Auto: return AutoMap<T>(sheet);
+                default: throw new NotImplementedException("Default switch case not implemented");
+            }
+        }
+
+        Map<T> AutoMap<T>(WorksheetPart sheet)
+        {
+            Map<T> result = null;
+            var enumerator = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().GetEnumerator();
+            _config.SkipCount = 0;
+            while (!(!enumerator.MoveNext() || (result?.IsValid ?? false)))
+            {
+                result = new Map<T>(ToDictionary(enumerator.Current));
+                _config.SkipCount++;
+            }
+            return result;
+        }
+
+        Dictionary<string, string> ToDictionary(Row row)
+        {
+            return row.Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString());
         }
         //=================================================
         #endregion
@@ -167,37 +201,6 @@ namespace XLOC.Reader
                     }
                 }
             }
-        }
-
-        int getSkip() => _config.SkipMode == SkipModeEnum.None ? 0 : _config.SkipCount ?? 0;
-
-        private Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
-        {
-            switch (_config.SkipMode)
-            {
-                case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
-                case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
-                case SkipModeEnum.Auto: return AutoMap<T>(sheet);
-                default: throw new NotImplementedException("Default switch case not implemented");
-            }
-        }
-
-        private Map<T> AutoMap<T>(WorksheetPart sheet)
-        {
-            Map<T> result = null;
-            var enumerator = sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().GetEnumerator();
-            _config.SkipCount = 0;
-            while (!(!enumerator.MoveNext() || (result?.IsValid ?? false)))
-            {
-                result = new Map<T>(ToDictionary(enumerator.Current));
-                _config.SkipCount++;
-            }
-            return result;
-        }
-
-        private Dictionary<string, string> ToDictionary(Row row)
-        {
-            return row.Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString());
         }
         //=================================================
         #endregion
