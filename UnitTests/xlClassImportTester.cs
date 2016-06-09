@@ -173,7 +173,7 @@ namespace ExcelReaderUnitTestProject
             {
                 var book = new xlBook();
                 var sheet = book.AddSheet("sheet1");
-                
+
                 sheet.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
                 sheet.AddCell("Мультизагаловок1", "C1", xlContentType.SharedString);
                 sheet.AddCell("дробь", "E1", xlContentType.SharedString);
@@ -187,7 +187,8 @@ namespace ExcelReaderUnitTestProject
                 xlWriter.Create(book).SaveToStream(memstream);
 
                 XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
-                TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray(); }
+                TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            }
         }
 
         [TestMethod]
@@ -280,6 +281,36 @@ namespace ExcelReaderUnitTestProject
                 var convertor = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto, SkipCount = 1 });
                 Assert.AreEqual(countShouldBe, convertor.ReadToArray<TestExcelClass>().Count());
             }
+        }
+
+        [TestMethod]
+        public void ExponentialNotice()
+        {
+            int countShouldBe = 4;
+            using (var memstream = new MemoryStream())
+            {
+                var book = new xlBook();
+                var sheet = book.AddSheet("test");
+
+                sheet.AddCell("Поле 1", $"A1", xlContentType.SharedString);
+                sheet.AddCell("Какая-то дата", $"B1", xlContentType.SharedString);
+                sheet.AddCell("Мультизагаловок1", $"C1", xlContentType.SharedString);
+                sheet.AddCell("дробь", $"F1", xlContentType.SharedString);
+
+                for (int i = 2; i < 2 + countShouldBe; i++)
+                {
+                    sheet.AddCell(i, $"A{i}", xlContentType.Integer);
+                    sheet.AddCell(DateTime.Now, $"B{i}", xlContentType.Date);
+                    sheet.AddCell($"Какая-то строка{i}", $"C{i}", xlContentType.SharedString);
+                    sheet.AddCell($"{(i / 100M).ToString("E")}", $"F{i}", xlContentType.Double);
+                }
+
+                xlWriter.Create(book).SaveToStream(memstream);
+                var data = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto }).ReadToArray<TestExcelClass>();
+                Assert.AreEqual(countShouldBe, data.Count());
+                Assert.IsTrue(data.All(x => x.decimalProperty != 0));
+            }
+
         }
     }
 }

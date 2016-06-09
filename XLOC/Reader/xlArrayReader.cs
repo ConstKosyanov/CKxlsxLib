@@ -60,7 +60,7 @@ namespace XLOC.Reader
                     case 12:
                     case 49:
                     case 164:
-                        return Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En"));
+                        return decimalParse(item.CellValue.Text);
                     case 10:
                         return (Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) * 100).ToString("N2") + "%";
                     case 14:
@@ -80,6 +80,13 @@ namespace XLOC.Reader
             {
                 return !string.IsNullOrWhiteSpace(item.CellValue?.Text) ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
             }
+        }
+
+        private static decimal decimalParse(string item)
+        {
+            decimal resul;
+            if (decimal.TryParse(item, out resul)) return resul;
+            return Convert.ToDecimal(double.Parse(item, new System.Globalization.CultureInfo("En")));
         }
         //=================================================
         #endregion
