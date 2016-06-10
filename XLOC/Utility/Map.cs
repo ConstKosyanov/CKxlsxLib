@@ -49,7 +49,7 @@ namespace XLOC.Utility
 
         #region Methods
         //=================================================
-        public IEnumerable<Cell> GetCells(Row row) => row.Descendants<Cell>().Where(x => Keys.Any(y => x.CellReference.Value.rIsMatch(y)));
+        public IEnumerable<Cell> GetCells(Row row) => row.Descendants<Cell>().Where(x => Keys.Any(y => x.CellReference.Value.rIsMatch($@"\A{y}(?=\d)")));
         //=================================================
         #endregion
 
