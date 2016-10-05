@@ -96,7 +96,7 @@ namespace ExcelReaderUnitTestProject
         }
 
         [TestMethod]
-        public void SaveBookThrougFile()
+        public void SaveBookThroughFile()
         {
             if (string.IsNullOrWhiteSpace(xl.Name))
                 NameSet();

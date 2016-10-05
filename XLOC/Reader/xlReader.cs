@@ -126,7 +126,7 @@ namespace XLOC.Reader
             int? RefId = null;
 
             Reference = item.CellReference.Value;
-            xlContentType? Type = null;//(item.DataType != null ? (CellValues?)item.DataType.Value : null).ToxlContentType();
+            xlContentType? Type = ToxlContentType(item.DataType != null ? (CellValues?)item.DataType.Value : null);
             try
             {
                 switch (Type)
@@ -155,6 +155,21 @@ namespace XLOC.Reader
             catch (Exception ex)
             {
                 throw new FormatException(string.Format("Ошибка конвертирования ячейки при чтении\nисходное значение: {0}\nконечный тип: {1}", item.CellValue.Text, Type), ex);
+            }
+        }
+
+        static xlContentType ToxlContentType(CellValues? val)
+        {
+            switch (val)
+            {
+                case CellValues.Boolean: return xlContentType.Boolean;
+                case CellValues.Date: return xlContentType.Date;
+                case CellValues.Error: throw new Exception(string.Format("Unknown cell type {0}", CellValues.Error));
+                case CellValues.InlineString: throw new Exception(string.Format("Unknown cell type {0}", DocumentFormat.OpenXml.Spreadsheet.CellValues.InlineString));
+                case CellValues.Number: return xlContentType.Double;
+                case CellValues.SharedString: return xlContentType.SharedString;
+                case CellValues.String: return xlContentType.String;
+                default: return xlContentType.Void;
             }
         }
         //=================================================

@@ -149,7 +149,7 @@ namespace XLOC.Reader
         static object ConvertToTypeWitNullableCheck(object value, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? ConvertNullable(value, type) : Convert.ChangeType(value, type);
         static object ConvertNullable(object value, Type type) => value != null ? Convert.ChangeType(value, type.GetGenericArguments().First()) : null;
 
-        int getSkip() => _config.SkipMode == SkipModeEnum.None ? 0 : _config.SkipCount ?? 0;
+        int getSkip() => _config.SkipMode == SkipModeEnum.None ? 1 : _config.SkipCount ?? 0;
 
         Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
         {

@@ -166,7 +166,7 @@ namespace ExcelReaderUnitTestProject
         }
 
         [TestMethod]
-        public void EventTest()
+        public void ValidationEventTest()
         {
             int countShouldBe = 4;
             using (var memstream = new MemoryStream())
@@ -187,6 +187,35 @@ namespace ExcelReaderUnitTestProject
                 xlWriter.Create(book).SaveToStream(memstream);
 
                 XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
+                TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+            }
+        }
+
+        [TestMethod]
+        public void CellEventTest()
+        {
+            int countShouldBe = 4;
+            using (var memstream = new MemoryStream())
+            {
+                var book = new xlBook();
+                var sheet = book.AddSheet("sheet1");
+
+                sheet.AddCell("Поле 1", "A1", xlContentType.SharedString);
+                sheet.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
+                sheet.AddCell("Мультизагаловок1", "C1", xlContentType.SharedString);
+                sheet.AddCell("дробь", "E1", xlContentType.SharedString);
+
+                for (int i = 2; i < 2 + countShouldBe; i++)
+                {
+                    sheet.AddCell("A", $"A{i}", xlContentType.SharedString);
+                    sheet.AddCell(DateTime.Now, $"B{i}", xlContentType.Date);
+                    sheet.AddCell($"Какая-то строка{i}", $"C{i}", xlContentType.SharedString);
+                    sheet.AddCell($"0.1{i}", $"E{i}", xlContentType.Double);
+                }
+                xlWriter.Create(book).SaveToStream(memstream);
+                bool result = true;
+                XlConverter.FromStream(memstream, new XLOCConfiguration { CellReadingErrorEvent = (s, e) => { if (e.Reference != "A2") result = false; } }).ReadToArray<TestExcelClass>();
+                Assert.IsFalse(result);
                 TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
             }
         }
