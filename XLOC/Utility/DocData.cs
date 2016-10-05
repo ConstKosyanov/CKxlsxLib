@@ -10,13 +10,15 @@ namespace XLOC.Utility
 {
     public class DocDictionaries : IDisposable
     {
-        private SpreadsheetDocument document;
+        SpreadsheetDocument document;
+        bool _autoDispose;
         public string[] sharedStrings;
         public string[] sheetNames;
         public CellFormat[] styles;
 
-        public DocDictionaries(SpreadsheetDocument document)
+        public DocDictionaries(SpreadsheetDocument document, bool AutoDispose)
         {
+            _autoDispose = AutoDispose;
             this.document = document;
             sharedStrings = document.WorkbookPart.SharedStringTablePart.SharedStringTable.Select(x => x.InnerText).ToArray();
             sheetNames = document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Select(x => x.Name.Value).ToArray();
@@ -36,7 +38,10 @@ namespace XLOC.Utility
         {
             if (Disposing)
             {
-                document.Close();
+                if (_autoDispose)
+                {
+                    document.Close();
+                }
             }
         }
         //=================================================

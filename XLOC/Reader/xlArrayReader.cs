@@ -186,7 +186,7 @@ namespace XLOC.Reader
         //=================================================
         public IEnumerable<T> ReadToEnumerable<T>(SpreadsheetDocument document) where T : IxlCompatible, new()
         {
-            using (docProvider = new DocDictionaries(document))
+            using (docProvider = new DocDictionaries(document, _config.AutoDispose))
             {
                 var sheets = _config.Sheets == null ? document.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => _config.Sheets.Contains(x.SheetId.Value)).ToArray();
                 foreach (var sheet in document.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(document.WorkbookPart.GetIdOfPart(x))))

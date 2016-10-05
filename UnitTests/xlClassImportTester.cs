@@ -342,5 +342,36 @@ namespace ExcelReaderUnitTestProject
                 Assert.IsTrue(data.All(x => x.decimalProperty != 0));
             }
         }
+
+        [TestMethod]
+        public void AutoDisposing()
+        {
+            int countShouldBe = 4;
+            using (var ms = new MemoryStream())
+            {
+                var book = new xlBook();
+                var sheet = book.AddSheet("test");
+
+                sheet.AddCell("Поле 1", $"A1", xlContentType.SharedString);
+                sheet.AddCell("Какая-то дата", $"B1", xlContentType.SharedString);
+                sheet.AddCell("Мультизагаловок1", $"C1", xlContentType.SharedString);
+                sheet.AddCell("дробь", $"AB1", xlContentType.SharedString);
+                sheet.AddCell("noize", $"AC1", xlContentType.SharedString);
+
+                for (int i = 2; i < 2 + countShouldBe; i++)
+                {
+                    sheet.AddCell(i, $"A{i}", xlContentType.Integer);
+                    sheet.AddCell(DateTime.Now, $"B{i}", xlContentType.Date);
+                    sheet.AddCell($"Какая-то строка{i}", $"C{i}", xlContentType.SharedString);
+                    sheet.AddCell($"{(i / 100M).ToString("E")}", $"AB{i}", xlContentType.Double);
+                    sheet.AddCell($"noize", $"AC{i}", xlContentType.Double);
+                }
+
+                xlWriter.Create(book).SaveToStream(ms);
+                var data = XlConverter.FromStream(ms, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto, ContinueOnRowReadingError = false, AutoDispose = false }).ReadToEnumerable<TestExcelClass>();
+                Assert.AreEqual(countShouldBe, data.Count());
+                Assert.IsTrue(data.All(x => x.decimalProperty != 0));
+            }
+        }
     }
 }
