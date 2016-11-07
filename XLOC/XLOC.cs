@@ -17,6 +17,8 @@ namespace XLOC
             try { return FromStream(new MemoryStream(File.ReadAllBytes(path)), configuration); }
             catch (Exception ex) { throw new IOException(string.Format("Не удалось открыть файл {0}", path), ex); }
         }
+
+        public static XLOCReader FromBuffer(byte[] buf, XLOCConfiguration configuration = null) => FromStream(new MemoryStream(buf), configuration);
     }
 
     public class XLOCReader
@@ -32,7 +34,7 @@ namespace XLOC
         //=================================================
         public IEnumerable<T> ReadToEnumerable<T>() where T : Utility.IxlCompatible, new() => new xlArrayReader(Configuration).ReadToEnumerable<T>(Document);
         public T[] ReadToArray<T>() where T : Utility.IxlCompatible, new() => ReadToEnumerable<T>().ToArray();
-        public xlBook ReadToBook() => new xlBookReader(Document).ReadToBook();
+        public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Document);
         //=================================================
         #endregion
     }

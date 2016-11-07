@@ -15,20 +15,19 @@ namespace XLOC.Book
 
         #region Constructor
         //=================================================
-        internal xlCell()
+        public xlCell() { }
+        public xlCell(string reference, xlContentType? type, object value, int? sharedId)
         {
-
+            Reference = reference;
+            Type = type;
+            Value = value;
+            SharedId = sharedId;
         }
         //=================================================
         #endregion
 
         #region Private
         //=================================================
-        internal T getAs<T>() where T : struct
-        {
-            return (T)Value;
-        }
-
         internal static string GetReference(int col, int row)
         {
             int m;
@@ -90,26 +89,6 @@ namespace XLOC.Book
         }
         public xlContentType? Type { get; set; }
         public int? SharedId { get; internal set; }
-        //=================================================
-        #endregion
-
-        #region Methods
-        //=================================================
-        public static implicit operator xlCell(CellInfo local)
-        {
-            return new xlCell()
-            {
-                Reference = local.Reference,
-                Type = local.ContentType,
-                Value = local.Value,
-                SharedId = local.SharedId
-            };
-        }
-
-        public static implicit operator CellInfo(xlCell local)
-        {
-            return new CellInfo(local.Reference, local.Type, local.Value, local.SharedId);
-        }
         //=================================================
         #endregion
     }

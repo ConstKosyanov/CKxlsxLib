@@ -1,92 +1,84 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using XLOC.Book;
 using XLOC.Utility;
+using XLOC.Utility.Events;
 using XLOC.Utility.Extensions;
 
 namespace XLOC.Reader
 {
-    public class xlReader : IDisposable
+    public abstract class xlReader
     {
         #region Variables
         //=================================================
-        protected SpreadsheetDocument doc;
-        protected string[] sharedStrings;
-        protected string[] sheetNames;
-        CellFormat[] styles;
+        protected XLOCConfiguration _config;
+        protected DocDictionaries _docProvider;
+        //=================================================
+        #endregion
+
+        #region Events
+        //=================================================
+        public event EventHandler<CellReadingErrorEventArgs> OnCellReadingError;
+
+        protected void cellErrorEventCaller(CellReadingErrorEventArgs args) => OnCellReadingError(this, args);
         //=================================================
         #endregion
 
         #region Constructor
         //=================================================
-        protected xlReader(SpreadsheetDocument document)
+        protected xlReader(XLOCConfiguration configuration)
         {
-            doc = document;
-            sharedStrings = doc.WorkbookPart.SharedStringTablePart.SharedStringTable.Select(x => x.InnerText).ToArray();
-            sheetNames = doc.WorkbookPart.Workbook.Sheets.Cast<DocumentFormat.OpenXml.Spreadsheet.Sheet>().Select(x => x.Name.Value).ToArray();
-            styles = doc.WorkbookPart.WorkbookStylesPart.Stylesheet.CellFormats.Cast<CellFormat>().ToArray();
-        }
-
-        #region Destructor
-        //=================================================
-        ~xlReader()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        void Dispose(bool Disposing)
-        {
-            if (Disposing)
-            {
-                doc.Close();
-            }
-        }
-        //=================================================
-        #endregion
-        //=================================================
-        #endregion
-
-        #region Factory
-        //=================================================
-        public static xlReader FromFile(string path)
-        {
-            try
-            {
-                return xlReader.FromStream(new MemoryStream(File.ReadAllBytes(path)));
-            }
-            catch (Exception ex)
-            {
-                throw new IOException(string.Format("Не удалось открыть файл {0}", path), ex);
-            }
-        }
-
-        public static xlReader FromStream(Stream stream)
-        {
-            return new xlReader(SpreadsheetDocument.Open(stream, false));
-        }
-
-        public static xlReader FromBuffer(byte[] buffer)
-        {
-            return new xlReader(SpreadsheetDocument.Open(new MemoryStream(buffer), false));
+            _config = configuration;
+            OnCellReadingError += (s, e) => { };
+            OnCellReadingError += _config.CellReadingErrorEvent;
         }
         //=================================================
         #endregion
 
         #region private
         //=================================================
+        static object ConvertToTypeWitNullableCheck(object value, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? ConvertNullable(value, type) : Convert.ChangeType(value, type);
+
+        static object ConvertNullable(object value, Type type) => value != null ? Convert.ChangeType(value, type.GetGenericArguments().First()) : null;
+
+        protected object getValue(Cell cell, Type type)
+        {
+            try
+            {
+                switch (cell.DataType?.Value)
+                {
+                    case CellValues.Error:
+                        throw new Exception(string.Format("Unknown cell type {0}", CellValues.Error));
+                    case CellValues.Boolean:
+                    case CellValues.Date:
+                        throw new NotImplementedException($"Преобразование для типа {type} не реализовано");
+                    case CellValues.Number:
+                        return ConvertToTypeWitNullableCheck(cell.CellValue, type);
+                    case CellValues.SharedString:
+                        var RefId = int.Parse(cell.CellValue.Text);
+                        return TypeDescriptor.GetConverter(type).ConvertFromString(_docProvider.sharedStrings[RefId].HasValue() ? _docProvider.sharedStrings[RefId] : string.Empty);
+                    case CellValues.String:
+                    case CellValues.InlineString:
+                        return ConvertToTypeWitNullableCheck(cell.CellValue?.Text, type);
+                    default:
+                        return ConvertToTypeWitNullableCheck(ConvertTypelessCell(cell), type);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Ошибка преобразования ячеек, адрес ссылки [{cell.CellReference}], искходное значение [{cell.CellValue?.Text}], исходный тип [{cell.DataType?.Value}], стиль [{cell.StyleIndex?.Value}]", ex);
+            }
+        }
+
         protected object ConvertTypelessCell(Cell item)
         {
-            if (item.StyleIndex != null && styles[item.StyleIndex.Value].NumberFormatId.Value != 0 && item.CellValue != null)
+            if (item.StyleIndex != null && _docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value != 0 && item.CellValue != null)
             {
-                switch (styles[item.StyleIndex.Value].NumberFormatId.Value)
+                switch (_docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value)
                 {
                     case 1:
                     case 3:
@@ -97,7 +89,7 @@ namespace XLOC.Reader
                     case 12:
                     case 49:
                     case 164:
-                        return Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En"));
+                        return decimalParse(item.CellValue.Text);
                     case 10:
                         return (Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) * 100).ToString("N2") + "%";
                     case 14:
@@ -110,74 +102,21 @@ namespace XLOC.Reader
                     case 167:
                         return (Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En"))).ToString("N2") + " ₽";
                     default:
-                        throw new NotImplementedException(string.Format("Не реализован обработчик для формата {0}", styles[item.StyleIndex.Value].NumberFormatId.Value));
+                        throw new NotImplementedException($"Не реализован обработчик для формата {_docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value}");
                 }
             }
             else
             {
-                return (item.CellValue != null && !string.IsNullOrWhiteSpace(item.CellValue.Text)) ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
+                return !string.IsNullOrWhiteSpace(item.CellValue?.Text) ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
             }
         }
 
-        protected CellInfo ReadCell(Cell item)
+        private static decimal decimalParse(string item)
         {
-            string Reference = string.Empty;
-            object Value = null;
-            int? RefId = null;
-
-            Reference = item.CellReference.Value;
-            xlContentType? Type = ToxlContentType(item.DataType != null ? (CellValues?)item.DataType.Value : null);
-            try
-            {
-                switch (Type)
-                {
-                    case xlContentType.Boolean:
-                        throw new NotImplementedException(string.Format("Преобразование для типа {0} не реализовано", xlContentType.Boolean));
-                    case xlContentType.Date:
-                        throw new NotImplementedException(string.Format("Преобразование для типа {0} не реализовано", xlContentType.Date));
-                    case xlContentType.Double:
-                        Value = item.CellValue != null ? (decimal?)Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En")) : null;
-                        break;
-                    case xlContentType.SharedString:
-                        RefId = int.Parse(item.CellValue.Text);
-                        Value = sharedStrings[RefId.Value].HasValue() ? sharedStrings[RefId.Value] : string.Empty;
-                        break;
-                    case xlContentType.String:
-                        Value = (item.CellValue == null ? null : item.CellValue.Text);
-                        break;
-                    //throw new NotImplementedException(string.Format("Преобразование для типа {0} не реализовано", xlContentType.String));
-                    default:
-                        Value = ConvertTypelessCell(item);
-                        break;
-                }
-                return new CellInfo(Reference, Type, Value, RefId);
-            }
-            catch (Exception ex)
-            {
-                throw new FormatException(string.Format("Ошибка конвертирования ячейки при чтении\nисходное значение: {0}\nконечный тип: {1}", item.CellValue.Text, Type), ex);
-            }
+            decimal resul;
+            if (decimal.TryParse(item, out resul)) return resul;
+            return Convert.ToDecimal(double.Parse(item, new System.Globalization.CultureInfo("En")));
         }
-
-        static xlContentType ToxlContentType(CellValues? val)
-        {
-            switch (val)
-            {
-                case CellValues.Boolean: return xlContentType.Boolean;
-                case CellValues.Date: return xlContentType.Date;
-                case CellValues.Error: throw new Exception(string.Format("Unknown cell type {0}", CellValues.Error));
-                case CellValues.InlineString: throw new Exception(string.Format("Unknown cell type {0}", DocumentFormat.OpenXml.Spreadsheet.CellValues.InlineString));
-                case CellValues.Number: return xlContentType.Double;
-                case CellValues.SharedString: return xlContentType.SharedString;
-                case CellValues.String: return xlContentType.String;
-                default: return xlContentType.Void;
-            }
-        }
-        //=================================================
-        #endregion
-
-        #region Methods
-        //=================================================
-        public virtual xlBook ReadToBook() => new xlBookReader(doc).ReadToBook();
         //=================================================
         #endregion
     }

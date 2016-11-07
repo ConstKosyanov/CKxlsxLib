@@ -30,7 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\UnitTests\bin\Release\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,7 +52,6 @@
     <Compile Include="Book\xlBook.cs" />
     <Compile Include="Book\xlCell.cs" />
     <Compile Include="Book\xlSheet.cs" />
-    <Compile Include="Utility\CellInfo.cs" />
     <Compile Include="XLOC.cs" />
     <Compile Include="Utility\Events\CellReadingErrorEventArgs.cs" />
     <Compile Include="Utility\Events\SheetValidationErrorEventArgs.cs" />
