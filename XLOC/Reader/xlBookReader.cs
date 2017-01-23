@@ -77,6 +77,7 @@ namespace XLOC.Reader
                     SourceType = item.DataType?.Value ?? null,
                     OutputType = xlContentType.Void,
                     Value = item.CellValue?.Text,
+                    Sheet = null,
                     Exception = ex
                 });
                 throw new FormatException(string.Format("Ошибка конвертирования ячейки при чтении\nисходное значение: {0}\nконечный тип: {1}", item.CellValue.Text, Type), ex);

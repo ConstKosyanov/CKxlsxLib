@@ -45,10 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utility\Map.cs" />
+    <Compile Include="Utility\SheetIdentifier.cs" />
     <Compile Include="Utility\SkipModeEnum.cs" />
     <Compile Include="XLOCConfiguration.cs" />
     <Compile Include="Reader\xlArrayReader.cs" />
-    <Compile Include="Utility\DocData.cs" />
+    <Compile Include="Utility\DocDictionaries.cs" />
     <Compile Include="Utility\MapItem.cs" />
     <Compile Include="Book\xlBook.cs" />
     <Compile Include="Book\xlCell.cs" />

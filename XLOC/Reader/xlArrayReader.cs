@@ -47,6 +47,7 @@ namespace XLOC.Reader
                         SourceType = cell.DataType?.Value ?? null,
                         OutputType = map[cell.CellReference.Value.rMatch("^[A-Z]+")].Attribute.ContentType,
                         Value = cell.CellValue?.Text,
+                        Sheet = map.Sheet,
                         Exception = ex
                     });
                     throw;
@@ -61,12 +62,16 @@ namespace XLOC.Reader
         {
             switch (_config.SkipMode)
             {
-                case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
-                case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
+                case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()), getSheetIdentifier(sheet));
+                case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()), getSheetIdentifier(sheet));
                 case SkipModeEnum.Auto: return AutoMap<T>(sheet);
                 default: throw new NotImplementedException("Default switch case not implemented");
             }
         }
+
+        SheetIdentifier getSheetIdentifier(WorksheetPart wSheet) => new SheetIdentifier(_config.Document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Single(x => x.Id == getWorksheetPartId(wSheet)));
+
+        string getWorksheetPartId(WorksheetPart wSheet) => _config.Document.WorkbookPart.GetIdOfPart(wSheet);
 
         Map<T> AutoMap<T>(WorksheetPart sheet)
         {
@@ -76,7 +81,7 @@ namespace XLOC.Reader
             //var row = sheet.Worksheet.GetFirstChild<SheetData>().GetFirstChild<Row>();
             foreach (var item in getRows(sheet.Worksheet.GetFirstChild<SheetData>()))
             {
-                result = new Map<T>(ToDictionary(item));
+                result = new Map<T>(ToDictionary(item), getSheetIdentifier(sheet));
                 _config.SkipCount++;
                 if (result.IsValid) return result;
             }
@@ -114,7 +119,7 @@ namespace XLOC.Reader
 
                     if (!map.IsValid)
                     {
-                        OnValidationFailure(this, new SheetValidationErrorEventArgs(map.MissingFields, map.Exceptioins));
+                        OnValidationFailure(this, new SheetValidationErrorEventArgs(map.MissingFields, map.Exceptioins, map.Sheet));
                         continue;
                     }
 

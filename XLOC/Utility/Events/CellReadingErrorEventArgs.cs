@@ -1,9 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace XLOC.Utility.Events
 {
@@ -15,5 +11,6 @@ namespace XLOC.Utility.Events
         public CellValues? SourceType { get; internal set; }
         public xlContentType? OutputType { get; internal set; }
         public object Value { get; internal set; }
+        public SheetIdentifier Sheet { get; set; }
     }
 }

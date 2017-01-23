@@ -172,7 +172,8 @@ namespace ExcelReaderUnitTestProject
             using (var memstream = new MemoryStream())
             {
                 var book = new xlBook();
-                var sheet = book.AddSheet("sheet1");
+                const string sheetName = "sheet1";
+                var sheet = book.AddSheet(sheetName);
 
                 sheet.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
                 sheet.AddCell("Мультизагаловок1", "C1", xlContentType.SharedString);
@@ -186,7 +187,7 @@ namespace ExcelReaderUnitTestProject
                 }
                 xlWriter.Create(book).SaveToStream(memstream);
 
-                XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1")) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
+                XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1") || e.Sheet.Name != sheetName) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
                 TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
             }
         }

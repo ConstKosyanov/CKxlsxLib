@@ -12,8 +12,9 @@ namespace XLOC.Utility
     {
         #region Constructor
         //=================================================
-        public Map(Dictionary<string, string> dictionary) : base()
+        public Map(Dictionary<string, string> dictionary, SheetIdentifier sheet) : base()
         {
+            Sheet = sheet;
             var props = getProperties();
             foreach (var prop in props)
             {
@@ -44,6 +45,7 @@ namespace XLOC.Utility
         static bool isRequired(PropertyInfo x) => GetAttribute<xlFieldAttribute>(x).IsRequired;
         static bool isNullable(PropertyInfo x) => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         static bool isDefault<type>(type item) => item.Equals(default(type));
+        public SheetIdentifier Sheet { get; set; }
         //=================================================
         #endregion
 
