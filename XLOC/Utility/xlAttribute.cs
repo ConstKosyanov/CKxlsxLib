@@ -4,8 +4,6 @@ using XLOC.Utility.Extensions;
 
 namespace XLOC.Utility
 {
-    public interface IxlCompatible { }
-
     [AttributeUsage(AttributeTargets.Property)]
     public class xlFieldAttribute : Attribute
     {

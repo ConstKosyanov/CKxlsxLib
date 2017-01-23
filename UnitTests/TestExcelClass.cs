@@ -4,7 +4,7 @@ using System;
 
 namespace ExcelReaderUnitTestProject
 {
-    public class TestExcelClass : IxlCompatible
+    public class TestExcelClass
     {
         [xlField(xlContentType.Integer, "Поле 1")]
         public int intProperty1 { get; set; }

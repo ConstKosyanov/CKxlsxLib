@@ -40,8 +40,8 @@ namespace XLOC
 
         #region Methods
         //=================================================
-        public IEnumerable<T> ReadToEnumerable<T>() where T : Utility.IxlCompatible, new() => new xlArrayReader(Configuration).ReadToEnumerable<T>();
-        public T[] ReadToArray<T>() where T : Utility.IxlCompatible, new() => ReadToEnumerable<T>().ToArray();
+        public IEnumerable<T> ReadToEnumerable<T>() where T : new() => new xlArrayReader(Configuration).ReadToEnumerable<T>();
+        public T[] ReadToArray<T>() where T : new() => ReadToEnumerable<T>().ToArray();
         public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Configuration.Document);
         //=================================================
         #endregion

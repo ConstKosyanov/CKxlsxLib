@@ -29,7 +29,7 @@ namespace XLOC.Reader
 
         #region Private
         //=================================================
-        T RowToObject<T>(Row row, Map<T> map) where T : IxlCompatible, new()
+        T RowToObject<T>(Row row, Map<T> map) where T : new()
         {
             T result = new T();
             foreach (var cell in map.GetCells(row))
@@ -58,7 +58,7 @@ namespace XLOC.Reader
 
         int getSkip() => _config.SkipMode == SkipModeEnum.None ? 1 : _config.SkipCount ?? 0;
 
-        Map<T> GetMap<T>(WorksheetPart sheet) where T : IxlCompatible, new()
+        Map<T> GetMap<T>(WorksheetPart sheet) where T : new()
         {
             switch (_config.SkipMode)
             {
@@ -108,7 +108,7 @@ namespace XLOC.Reader
 
         #region Methods
         //=================================================
-        public IEnumerable<T> ReadToEnumerable<T>() where T : IxlCompatible, new()
+        public IEnumerable<T> ReadToEnumerable<T>() where T : new()
         {
             using (_docProvider = new DocDictionaries(_config.Document, _config.AutoDispose))
             {

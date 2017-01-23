@@ -37,7 +37,7 @@ namespace XLOC.Writer
             return new xlBookWriter(xlBook);
         }
 
-        public static xlWriter Create<T>(IEnumerable<T> items) where T : IxlCompatible
+        public static xlWriter Create<T>(IEnumerable<T> items) where T : new()
         {
             return new xlArrayWriter<T>(items);
         }

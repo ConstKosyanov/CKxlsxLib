@@ -10,7 +10,7 @@ namespace ExcelReaderUnitTestProject
     [TestClass]
     public class UnnamedFieldTester
     {
-        class MyClass : IxlCompatible
+        class MyClass
         {
             [xlField(xlContentType.Integer)]
             public int Field { get; set; }
