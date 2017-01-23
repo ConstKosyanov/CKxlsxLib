@@ -10,7 +10,7 @@ namespace XLOC
 {
     public class XlConverter
     {
-        public static XLOCReader FromStream(Stream stream, XLOCConfiguration configuration = null) => new XLOCReader { Configuration = configuration ?? new XLOCConfiguration(), Document = SpreadsheetDocument.Open(stream, false) };
+        public static XLOCReader FromStream(Stream stream, XLOCConfiguration configuration = null) => new XLOCReader((configuration ?? new XLOCConfiguration()).AddDocument(SpreadsheetDocument.Open(stream, false)));
 
         public static XLOCReader FromFile(string path, XLOCConfiguration configuration = null)
         {
@@ -23,18 +23,26 @@ namespace XLOC
 
     public class XLOCReader
     {
+        #region Constructor
+        //=================================================
+        internal XLOCReader(XLOCConfiguration Configuration)
+        {
+            this.Configuration = Configuration;
+        }
+        //=================================================
+        #endregion
+
         #region Properties
         //=================================================
         public XLOCConfiguration Configuration { get; set; }
-        public SpreadsheetDocument Document { get; internal set; }
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public IEnumerable<T> ReadToEnumerable<T>() where T : Utility.IxlCompatible, new() => new xlArrayReader(Configuration).ReadToEnumerable<T>(Document);
+        public IEnumerable<T> ReadToEnumerable<T>() where T : Utility.IxlCompatible, new() => new xlArrayReader(Configuration).ReadToEnumerable<T>();
         public T[] ReadToArray<T>() where T : Utility.IxlCompatible, new() => ReadToEnumerable<T>().ToArray();
-        public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Document);
+        public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Configuration.Document);
         //=================================================
         #endregion
     }

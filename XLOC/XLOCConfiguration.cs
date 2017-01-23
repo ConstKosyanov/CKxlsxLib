@@ -1,5 +1,6 @@
 ﻿using XLOC.Utility.Events;
 using System;
+using DocumentFormat.OpenXml.Packaging;
 
 namespace XLOC
 {
@@ -12,5 +13,12 @@ namespace XLOC
         public Utility.SkipModeEnum SkipMode { get; set; } = Utility.SkipModeEnum.None;
         public int? SkipCount { get; set; }
         public bool AutoDispose { get; set; } = true;
+        internal SpreadsheetDocument Document { get; set; }
+
+        internal XLOCConfiguration AddDocument(SpreadsheetDocument document)
+        {
+            Document = document;
+            return this;
+        }
     }
 }

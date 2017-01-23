@@ -4,7 +4,6 @@ using System.Linq;
 using XLOC.Utility;
 using XLOC.Utility.Events;
 using XLOC.Utility.Extensions;
-using System.ComponentModel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 
@@ -104,12 +103,12 @@ namespace XLOC.Reader
 
         #region Methods
         //=================================================
-        public IEnumerable<T> ReadToEnumerable<T>(SpreadsheetDocument document) where T : IxlCompatible, new()
+        public IEnumerable<T> ReadToEnumerable<T>() where T : IxlCompatible, new()
         {
-            using (_docProvider = new DocDictionaries(document, _config.AutoDispose))
+            using (_docProvider = new DocDictionaries(_config.Document, _config.AutoDispose))
             {
-                var sheets = _config.Sheets == null ? document.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => _config.Sheets.Contains(x.SheetId.Value)).ToArray();
-                foreach (var sheet in document.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(document.WorkbookPart.GetIdOfPart(x))))
+                var sheets = _config.Sheets == null ? _config.Document.WorkbookPart.Workbook.Sheets.Cast<Sheet>() : _config.Document.WorkbookPart.Workbook.Sheets.Cast<Sheet>().Where(x => _config.Sheets.Contains(x.SheetId.Value)).ToArray();
+                foreach (var sheet in _config.Document.WorkbookPart.WorksheetParts.Where(x => sheets.Select(y => y.Id.Value).Contains(_config.Document.WorkbookPart.GetIdOfPart(x))))
                 {
                     Map<T> map = GetMap<T>(sheet);
 
