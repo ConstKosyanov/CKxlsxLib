@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using XLOC;
@@ -12,7 +13,10 @@ namespace ExcelReaderUnitTestProject
     [TestClass]
     public class xlClassImportTester
     {
+        #region Init
+        //=================================================
         static string path = string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), "test2.xlsx");
+        Random rnd = new Random();
 
         TestExcelClass[] data = new TestExcelClass[]
         {
@@ -26,8 +30,20 @@ namespace ExcelReaderUnitTestProject
             new TestExcelClass() { intProperty1 = 10, intProperty3 = 10, SomeDate = DateTime.Now, SomeString = "sdfsw"},
         };
 
+        List<fieldGenerator> fields = new List<fieldGenerator>
+        {
+            new fieldGenerator { Value = fieldsEnum.intProperty2, contentType = xlContentType.Integer, Caption = "Поле 2", Filler = (x)=>x },
+            new fieldGenerator { Value = fieldsEnum.intProperty3, contentType= xlContentType.Integer, Caption = "Поле 3", Filler = (x)=>x },
+            new fieldGenerator { Value = fieldsEnum.decimalProperty, contentType= xlContentType.Double, Caption = "дробь", Filler = (x)=>$"0.{x}" },
+            new fieldGenerator { Value = fieldsEnum.SomeDate, contentType= xlContentType.Date , Caption = "Какая-то дата", Filler = (x)=>DateTime.Now },
+            new fieldGenerator { Value = fieldsEnum.SomeString, contentType = xlContentType.SharedString, Caption = "Какая-то строка", Filler = (x)=>$"Какая-то строка{x}" },
+            new fieldGenerator { Value = fieldsEnum.Guid, contentType = xlContentType.SharedString, Caption = "GuidField", Filler = (x)=>Guid.NewGuid() },
+        };
+
         [ClassInitialize]
         public static void Initialize(TestContext ctx) => File.Delete(path);
+        //=================================================
+        #endregion
 
         [TestMethod]
         public void Write()
@@ -215,9 +231,9 @@ namespace ExcelReaderUnitTestProject
                 }
                 xlWriter.Create(book).SaveToStream(memstream);
                 bool result = true;
-                XlConverter.FromStream(memstream, new XLOCConfiguration { CellReadingErrorEvent = (s, e) => { if (e.Reference != "A2") result = false; } }).ReadToArray<TestExcelClass>();
+                XlConverter.FromStream(memstream, new XLOCConfiguration { CellReadingErrorEvent = (s, e) => { if (e.Reference != "A2") result = false; }, AutoDispose = false }).ReadToArray<TestExcelClass>();
                 Assert.IsFalse(result);
-                TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
+                TestExcelClass[] data = XlConverter.FromStream(memstream, new XLOCConfiguration { AutoDispose = true }).ReadToArray<TestExcelClass>();
             }
         }
 
@@ -288,7 +304,7 @@ namespace ExcelReaderUnitTestProject
                 var book = new xlBook();
                 var sheet = book.AddSheet("test");
 
-                int skip = new Random().Next(4) + 1;
+                int skip = rnd.Next(4) + 1;
                 for (int i = 0; i < skip; i++)
                 {
                     sheet.AddCell($"Caption{i + 1}", $"A{i + 1}", xlContentType.SharedString);
@@ -374,5 +390,154 @@ namespace ExcelReaderUnitTestProject
                 Assert.IsTrue(data.All(x => x.decimalProperty != 0));
             }
         }
+
+        #region Group
+        //=================================================
+        [TestMethod]
+        public void ReadToGroup_SameColumns()
+        {
+            Dictionary<int, int> result = new Dictionary<int, int> { };
+
+            using (var ms = new MemoryStream())
+            {
+                var book = new xlBook();
+
+                for (int i = 0; i < rnd.Next(3, 5); i++)
+                {
+                    var sheet = book.AddSheet($"Sheet{i}");
+
+                    sheet.AddCell("Поле 1", "A1", xlContentType.SharedString);
+                    sheet.AddCell("Какая-то дата", "B1", xlContentType.SharedString);
+                    sheet.AddCell("Мультизагаловок1", "C1", xlContentType.SharedString);
+                    sheet.AddCell("дробь", "E1", xlContentType.SharedString);
+
+                    result[i] = rnd.Next(4, 6);
+                    for (int j = 2; j < 2 + result[i]; j++)
+                    {
+                        sheet.AddCell(j, $"A{j}", xlContentType.Integer);
+                        sheet.AddCell(DateTime.Now, $"B{j}", xlContentType.Date);
+                        sheet.AddCell($"Какая-то строка{j}", $"C{j}", xlContentType.SharedString);
+                        sheet.AddCell($"0.1{j}", $"E{j}", xlContentType.Double);
+                    }
+                }
+
+                xlWriter.Create(book).SaveToStream(ms);
+                var data = XlConverter.FromStream(ms, new XLOCConfiguration { }).ReadToGroup<TestExcelClass>();
+
+                Assert.AreEqual(result.Count, data.Count(), "Количество листов не совпадает");
+                foreach (var item in result)
+                {
+                    var itemsCount = data.Single(x => x.Key.Name == $"Sheet{item.Key}");
+                    Assert.AreEqual(item.Value, itemsCount.Count(), $"Количество записей на листе {item.Key} не соответсвует");
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ReadToGroup_SameClass()
+        {
+            Dictionary<int, int> result = new Dictionary<int, int> { };
+
+            using (var ms = new MemoryStream())
+            {
+                var book = new xlBook();
+
+                for (int i = 0; i < rnd.Next(3, 5); i++)
+                {
+                    var sheet = book.AddSheet($"Sheet{i}");
+
+                    var columns = fields.Where(x => rnd.Next(0, 5) < 5).ToArray();
+                    var letter = 'B';
+                    sheet.AddCell("Поле 1", "A1", xlContentType.SharedString);
+                    foreach (var item in columns)
+                        sheet.AddCell(item.Caption, $"{item.Col = letter++}1", xlContentType.SharedString);
+
+
+                    result[i] = rnd.Next(4, 6);
+                    for (int j = 2; j < 2 + result[i]; j++)
+                        foreach (var item in columns)
+                            sheet.AddCell(item.Filler(j), $"{item.Col}{j}", item.contentType);
+                }
+
+                xlWriter.Create(book).SaveToStream(ms);
+                var data = XlConverter.FromStream(ms, new XLOCConfiguration { }).ReadToGroup<TestExcelClass>();
+
+                Assert.AreEqual(result.Count, data.Count(), "Количество листов не совпадает");
+                foreach (var item in result)
+                {
+                    var itemsCount = data.Single(x => x.Key.Name == $"Sheet{item.Key}");
+                    Assert.AreEqual(item.Value, itemsCount.Count(), $"Количество записей на листе {item.Key} не соответсвует");
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ReadToGroup_DifferentClasses()
+        {
+            using (var ms = new MemoryStream())
+            {
+                var book = new xlBook();
+
+                var sheet = book.AddSheet("Sheet1");
+
+                char col = 'B';
+                sheet.AddCell("Поле 1", "A1", xlContentType.SharedString);
+                foreach (var item in fields)
+                    sheet.AddCell(item.Caption, $"{item.Col = col++}1", xlContentType.SharedString);
+
+                for (int i = 2; i < 5; i++)
+                    foreach (var item in fields)
+                        sheet.AddCell(item.Filler(i), $"{item.Col}{i}", item.contentType);
+
+                sheet = book.AddSheet("Sheet2");
+                sheet.AddCell("MyProperty", "A1", xlContentType.SharedString);
+                sheet.AddCell("Test2UniqueField", "B1", xlContentType.SharedString);
+
+                for (int i = 2; i < 5; i++)
+                {
+                    sheet.AddCell(i, $"A{i}", xlContentType.Integer);
+                    sheet.AddCell(i * 2, $"B{i}", xlContentType.Integer);
+                }
+
+                xlWriter.Create(book).SaveToStream(ms);
+                var reader = XlConverter.FromStream(ms, new XLOCConfiguration { });
+
+                var res1 = reader.ReadToGroup<TestExcelClass>();
+                Assert.AreEqual(1, res1.Count(x => x.Any()));
+                Assert.AreEqual(3, res1.Single(x => x.Any()).Count());
+
+                var res2 = reader.ReadToGroup<testExcelClass2>();
+                Assert.AreEqual(1, res2.Count(x => x.Any()));
+                Assert.AreEqual(3, res2.Single(x => x.Any()).Count());
+
+                Assert.AreEqual(3, reader.ReadToEnumerable<TestExcelClass>().Count());
+                Assert.AreEqual(3, reader.ReadToEnumerable<testExcelClass2>().Count());
+            }
+        }
+        //=================================================
+        #endregion
+
+        #region Sub classes
+        //=================================================
+        enum fieldsEnum { intProperty2, intProperty3, decimalProperty, SomeDate, SomeString, Guid }
+
+        class fieldGenerator
+        {
+            public fieldsEnum Value { get; set; }
+            public xlContentType contentType { get; set; }
+            public Func<int, object> Filler { get; set; }
+            public string Caption { get; set; }
+            public char Col { get; set; }
+        }
+
+        class testExcelClass2
+        {
+            [xlField]
+            public int MyProperty { get; set; }
+            [xlField]
+            public int Test2UniqueField { get; set; }
+        }
+        //=================================================
+        #endregion
     }
 }

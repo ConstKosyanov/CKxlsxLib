@@ -7,7 +7,7 @@ namespace XLOC.Utility.Events
     {
         public Exception Exception { get; internal set; }
         public string Reference { get; internal set; }
-        public int Row { get; set; }
+        public uint Row { get; set; }
         public CellValues? SourceType { get; internal set; }
         public xlContentType? OutputType { get; internal set; }
         public object Value { get; internal set; }

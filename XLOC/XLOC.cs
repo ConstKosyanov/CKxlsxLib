@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using XLOC.Book;
 using XLOC.Reader;
+using XLOC.Utility;
 
 namespace XLOC
 {
@@ -42,6 +43,8 @@ namespace XLOC
         //=================================================
         public IEnumerable<T> ReadToEnumerable<T>() where T : new() => new xlArrayReader(Configuration).ReadToEnumerable<T>();
         public T[] ReadToArray<T>() where T : new() => ReadToEnumerable<T>().ToArray();
+        public IEnumerable<IGrouping<SheetIdentifier, T>> ReadToGroup<T>() where T : new() => new xlArrayReader(Configuration).ReadToGroup<T>();
+
         public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Configuration.Document);
         //=================================================
         #endregion

@@ -56,8 +56,8 @@ namespace XLOC.Reader
                         break;
                     case xlContentType.SharedString:
                         RefId = int.Parse(item.CellValue.Text);
-                        Value = _docProvider.sharedStrings[RefId.Value].HasValue()
-                            ? _docProvider.sharedStrings[RefId.Value]
+                        Value = _config.DocProvider.sharedStrings[RefId.Value].HasValue()
+                            ? _config.DocProvider.sharedStrings[RefId.Value]
                             : string.Empty;
                         break;
                     case xlContentType.String:
@@ -86,29 +86,27 @@ namespace XLOC.Reader
 
         public xlBook ReadToBook(SpreadsheetDocument document)
         {
-            using (_docProvider = new DocDictionaries(document, _config.AutoDispose))
+            xlBook result = new xlBook();
+            for (int i = 0; i < document.WorkbookPart.WorksheetParts.Count(); i++)
             {
-                xlBook result = new xlBook();
-                for (int i = 0; i < document.WorkbookPart.WorksheetParts.Count(); i++)
+                result.AddSheet(_config.DocProvider.sheetNames[i]);
+                var sheet = document.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>().SingleOrDefault(s => s.Name == _config.DocProvider.sheetNames[i]);
+                var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheet.Id.Value);
+                foreach (var cell in worksheetPart.Worksheet.GetFirstChild<SheetData>().Descendants<Cell>())
                 {
-                    result.AddSheet(_docProvider.sheetNames[i]);
-                    var sheet = document.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>().SingleOrDefault(s => s.Name == _docProvider.sheetNames[i]);
-                    var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheet.Id.Value);
-                    foreach (var cell in worksheetPart.Worksheet.GetFirstChild<SheetData>().Descendants<Cell>())
+                    try
                     {
-                        try
-                        {
-                            if (cell == null) { continue; }
-                            result[i].Cells.Add(ReadCell(cell));
-                        }
-                        catch (Exception)
-                        {
-                            if (_config.ContinueOnRowReadingError) continue; else throw;
-                        }
+                        if (cell == null) { continue; }
+                        result[i].Cells.Add(ReadCell(cell));
+                    }
+                    catch (Exception)
+                    {
+                        if (_config.ContinueOnRowReadingError) continue; else throw;
                     }
                 }
-                return result;
             }
+            return result;
+
         }
         //=================================================
         #endregion

@@ -16,7 +16,6 @@ namespace XLOC.Reader
         #region Variables
         //=================================================
         protected XLOCConfiguration _config;
-        protected DocDictionaries _docProvider;
         //=================================================
         #endregion
 
@@ -60,7 +59,7 @@ namespace XLOC.Reader
                         return ConvertToTypeWitNullableCheck(cell.CellValue, type);
                     case CellValues.SharedString:
                         var RefId = int.Parse(cell.CellValue.Text);
-                        return TypeDescriptor.GetConverter(type).ConvertFromString(_docProvider.sharedStrings[RefId].HasValue() ? _docProvider.sharedStrings[RefId] : string.Empty);
+                        return TypeDescriptor.GetConverter(type).ConvertFromString(_config.DocProvider.sharedStrings[RefId].HasValue() ? _config.DocProvider.sharedStrings[RefId] : string.Empty);
                     case CellValues.String:
                     case CellValues.InlineString:
                         return ConvertToTypeWitNullableCheck(cell.CellValue?.Text, type);
@@ -76,9 +75,9 @@ namespace XLOC.Reader
 
         protected object ConvertTypelessCell(Cell item)
         {
-            if (item.StyleIndex != null && _docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value != 0 && item.CellValue != null)
+            if (item.StyleIndex != null && _config.DocProvider.styles[item.StyleIndex.Value].NumberFormatId.Value != 0 && item.CellValue != null)
             {
-                switch (_docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value)
+                switch (_config.DocProvider.styles[item.StyleIndex.Value].NumberFormatId.Value)
                 {
                     case 1:
                     case 3:
@@ -102,7 +101,7 @@ namespace XLOC.Reader
                     case 167:
                         return (Convert.ToDecimal(item.CellValue.Text, new System.Globalization.CultureInfo("En"))).ToString("N2") + " ₽";
                     default:
-                        throw new NotImplementedException($"Не реализован обработчик для формата {_docProvider.styles[item.StyleIndex.Value].NumberFormatId.Value}");
+                        throw new NotImplementedException($"Не реализован обработчик для формата {_config.DocProvider.styles[item.StyleIndex.Value].NumberFormatId.Value}");
                 }
             }
             else
