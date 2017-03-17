@@ -1,11 +1,7 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using XLOC.Book;
-using XLOC.Utility;
 using XLOC.Utility.Events;
 using XLOC.Utility.Extensions;
 
@@ -58,7 +54,7 @@ namespace XLOC.Reader
                     case CellValues.Number:
                         return convertToTypeWitNullableCheck(cell.CellValue, type);
                     case CellValues.SharedString:
-                        var RefId = int.Parse(cell.CellValue.Text);
+                        var RefId = long.Parse(cell.CellValue.Text);
                         return TypeDescriptor.GetConverter(type).ConvertFromString(_config.DocProvider.sharedStrings[RefId].HasValue() ? _config.DocProvider.sharedStrings[RefId] : string.Empty);
                     case CellValues.String:
                     case CellValues.InlineString:
@@ -81,7 +77,7 @@ namespace XLOC.Reader
                 {
                     case 1:
                     case 3:
-                        return Convert.ToInt32(item.CellValue.Text);
+                        return Convert.ToInt64(item.CellValue.Text);
                     case 2:
                     case 4:
                     case 11:
@@ -110,11 +106,8 @@ namespace XLOC.Reader
             }
         }
 
-        private static decimal decimalParse(string item)
-        {
-            if (decimal.TryParse(item, out var resul)) return resul;
-            return Convert.ToDecimal(double.Parse(item, new System.Globalization.CultureInfo("En")));
-        }
+        private static decimal decimalParse(string item) => decimal.TryParse(item, out var resul) ? resul
+            : Convert.ToDecimal(double.Parse(item, new System.Globalization.CultureInfo("En")));
         //=================================================
         #endregion
     }
