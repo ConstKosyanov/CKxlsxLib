@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace XLOC.Writer
 {
-    internal class xlArrayWriter<T> : xlWriter
+    internal class XlArrayWriter<T> : XlWriter
     {
         #region Variables
         //=================================================
@@ -20,10 +20,7 @@ namespace XLOC.Writer
 
         #region Constructor
         //=================================================
-        public xlArrayWriter(IEnumerable<T> items)
-        {
-            this.items = items.ToArray();
-        }
+        public XlArrayWriter(IEnumerable<T> items) => this.items = items.ToArray();
         //=================================================
         #endregion
 
@@ -48,33 +45,33 @@ namespace XLOC.Writer
         {
             if (RowId.Value == 1)
             {
-                return GetCaptions();
+                return getCaptions();
             }
             else
             {
-                return GetValuesFrom((int)RowId.Value);
+                return getValuesFrom((int)RowId.Value);
             }
         }
 
-        private IEnumerable<Cell> GetValuesFrom(int index)
+        IEnumerable<Cell> getValuesFrom(int index)
         {
-            var item = items[index - 2];
+            T item = items[index - 2];
             int ColCounter = 1;
-            foreach (var property in typeof(T).GetProperties().Where(x => xlFieldAttribute.IsDefined(x, typeof(xlFieldAttribute))))
+            foreach (System.Reflection.PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
             {
-                yield return property.GetValue(item) != null ? CovertCell(new Cell() { CellReference = new StringValue(Book.xlCell.GetReference(ColCounter, index)) }, property.GetValue(item), ((xlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(xlFieldAttribute))).ContentType) : null;
+                yield return property.GetValue(item) != null ? CovertCell(new Cell() { CellReference = new StringValue(Book.XlCell.GetReference(ColCounter, index)) }, property.GetValue(item), ((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).ContentType) : null;
                 ColCounter++;
             }
             yield break;
         }
 
-        private IEnumerable<Cell> GetCaptions()
+        IEnumerable<Cell> getCaptions()
         {
             int ColCounter = 1;
-            foreach (var property in typeof(T).GetProperties().Where(x => xlFieldAttribute.IsDefined(x, typeof(xlFieldAttribute))))
+            foreach (System.Reflection.PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
             {
-                var attr = (xlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(xlFieldAttribute));
-                var cell = new Cell() { CellReference = new StringValue(Book.xlCell.GetReference(ColCounter++, 1)) };
+                var attr = (XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute));
+                var cell = new Cell() { CellReference = new StringValue(Book.XlCell.GetReference(ColCounter++, 1)) };
                 cell.CellValue = new CellValue(getSharedStringId(attr.Captions.First()).ToString());
                 cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
                 yield return cell;

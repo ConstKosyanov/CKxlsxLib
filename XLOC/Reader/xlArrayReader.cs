@@ -10,7 +10,7 @@ using XLOC.Utility.Exceptions;
 
 namespace XLOC.Reader
 {
-    class xlArrayReader : xlReader
+    class XlArrayReader : XlReader
     {
         #region Events
         //=================================================
@@ -20,7 +20,7 @@ namespace XLOC.Reader
 
         #region Constructor
         //=================================================
-        public xlArrayReader(XLOCConfiguration configuration) : base(configuration)
+        public XlArrayReader(XLOCConfiguration configuration) : base(configuration)
         {
             OnValidationFailure += (s, e) => { };
             OnValidationFailure += _config.ValidationFailureEvent;
@@ -46,42 +46,42 @@ namespace XLOC.Reader
             }
         }
 
-        Dictionary<string, string> ToDictionary(Row row) => row.Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString());
+        Dictionary<string, string> toDictionary(Row row) => row.Descendants<Cell>().Where(x => x.CellValue != null).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString());
 
-        Map<T> AutoMap<T>(WorksheetPart sheet)
+        Map<T> autoMap<T>(WorksheetPart sheet)
         {
             Map<T> result = null;
             _config.SkipCount = 0;
-            foreach (var item in getRows(sheet.Worksheet.GetFirstChild<SheetData>()))
+            foreach (Row item in getRows(sheet.Worksheet.GetFirstChild<SheetData>()))
             {
-                result = new Map<T>(ToDictionary(item));
+                result = new Map<T>(toDictionary(item));
                 _config.SkipCount++;
                 if (result.IsValid) return result;
             }
             return result;
         }
 
-        Map<T> GetMap<T>(WorksheetPart sheet) where T : new()
+        Map<T> getMap<T>(WorksheetPart sheet) where T : new()
         {
             switch (_config.SkipMode)
             {
                 case SkipModeEnum.None: return new Map<T>(sheet.GetCaptionCells().ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
                 case SkipModeEnum.Manual: return new Map<T>(sheet.GetCaptionCells(_config.SkipCount.Value).ToDictionary(x => x.CellReference.Value, x => getValue(x, typeof(string)).ToString()));
-                case SkipModeEnum.Auto: return AutoMap<T>(sheet);
+                case SkipModeEnum.Auto: return autoMap<T>(sheet);
                 default: throw new NotImplementedException("Default switch case not implemented");
             }
         }
         //=================================================
         #endregion
 
-        T RowToObject<T>(Row row, Map<T> map) where T : new()
+        T rowToObject<T>(Row row, Map<T> map) where T : new()
         {
             T result = new T();
-            foreach (var cell in map.GetCells(row))
+            foreach (Cell cell in map.GetCells(row))
             {
                 try
                 {
-                    var mapItem = map[cell.CellReference.Value.rMatch(@"^[A-Z]+")];
+                    MapItem mapItem = map[cell.CellReference.Value.rMatch(@"^[A-Z]+")];
                     mapItem.Property.SetValue(result, getValue(cell, mapItem.Property.PropertyType));
                 }
                 catch (Exception ex)
@@ -110,8 +110,8 @@ namespace XLOC.Reader
 
         IEnumerable<T> readSheet<T>(WorksheetPart wSheet) where T : new()
         {
-            Map<T> map = GetMap<T>(wSheet);
-            var Sheet = createSheetIdentifier(wSheet);
+            Map<T> map = getMap<T>(wSheet);
+            SheetIdentifier Sheet = createSheetIdentifier(wSheet);
 
             if (!map.IsValid)
             {
@@ -119,10 +119,10 @@ namespace XLOC.Reader
                 yield break;
             }
 
-            foreach (var row in wSheet.Worksheet.Descendants<Row>().Skip(getSkip()))
+            foreach (Row row in wSheet.Worksheet.Descendants<Row>().Skip(getSkip()))
             {
                 T tmp;
-                try { tmp = RowToObject<T>(row, map); }
+                try { tmp = rowToObject<T>(row, map); }
                 catch (CellReadingException ex)
                 {
                     cellErrorEventCaller(new CellReadingErrorEventArgs

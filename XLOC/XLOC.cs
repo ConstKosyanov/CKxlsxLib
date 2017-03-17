@@ -26,10 +26,7 @@ namespace XLOC
     {
         #region Constructor
         //=================================================
-        internal XLOCReader(XLOCConfiguration Configuration)
-        {
-            this.Configuration = Configuration;
-        }
+        internal XLOCReader(XLOCConfiguration Configuration) => this.Configuration = Configuration;
         //=================================================
         #endregion
 
@@ -41,11 +38,11 @@ namespace XLOC
 
         #region Methods
         //=================================================
-        public IEnumerable<T> ReadToEnumerable<T>() where T : new() => new xlArrayReader(Configuration).ReadToEnumerable<T>();
+        public IEnumerable<T> ReadToEnumerable<T>() where T : new() => new XlArrayReader(Configuration).ReadToEnumerable<T>();
         public T[] ReadToArray<T>() where T : new() => ReadToEnumerable<T>().ToArray();
-        public IEnumerable<IGrouping<SheetIdentifier, T>> ReadToGroup<T>() where T : new() => new xlArrayReader(Configuration).ReadToGroup<T>();
+        public IEnumerable<IGrouping<SheetIdentifier, T>> ReadToGroup<T>() where T : new() => new XlArrayReader(Configuration).ReadToGroup<T>();
 
-        public xlBook ReadToBook() => new xlBookReader(Configuration).ReadToBook(Configuration.Document);
+        public XlBook ReadToBook() => new XlBookReader(Configuration).ReadToBook(Configuration.Document);
         //=================================================
         #endregion
     }

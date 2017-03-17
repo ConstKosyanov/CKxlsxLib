@@ -8,7 +8,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace XLOC.Utility
 {
-    public class DocDictionaries : IDisposable
+    public sealed class DocDictionaries : IDisposable
     {
         SpreadsheetDocument document;
         bool _autoDispose;
@@ -29,12 +29,12 @@ namespace XLOC.Utility
         //=================================================
         ~DocDictionaries()
         {
-            Dispose(false);
+            dispose(false);
         }
 
-        public void Dispose() => Dispose(true);
+        public void Dispose() => dispose(true);
 
-        void Dispose(bool Disposing)
+        void dispose(bool Disposing)
         {
             if (Disposing)
             {

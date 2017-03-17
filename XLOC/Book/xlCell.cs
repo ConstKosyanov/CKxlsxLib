@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace XLOC.Book
 {
-    public class xlCell
+    public class XlCell
     {
         #region Variables
         //=================================================
@@ -15,8 +15,8 @@ namespace XLOC.Book
 
         #region Constructor
         //=================================================
-        public xlCell() { }
-        public xlCell(string reference, xlContentType? type, object value, int? sharedId)
+        public XlCell() { }
+        public XlCell(string reference, XlContentType? type, object value, int? sharedId)
         {
             Reference = reference;
             Type = type;
@@ -48,7 +48,7 @@ namespace XLOC.Book
         public object Value { get; set; }
         public int Row
         {
-            get { return row; }
+            get => row;
             set
             {
                 if (value < 1)
@@ -58,7 +58,7 @@ namespace XLOC.Book
         }
         public int Col
         {
-            get { return column; }
+            get => column;
             set
             {
                 if (value < 1)
@@ -68,10 +68,7 @@ namespace XLOC.Book
         }
         public string Reference
         {
-            get
-            {
-                return GetReference(column, row);
-            }
+            get => GetReference(column, row);
             set
             {
                 if (!Regex.IsMatch(value, @"^[A-Z]+\d+$"))
@@ -87,7 +84,7 @@ namespace XLOC.Book
                 Row = int.Parse(Regex.Match(value, @"\d+$").Value);
             }
         }
-        public xlContentType? Type { get; set; }
+        public XlContentType? Type { get; set; }
         public int? SharedId { get; internal set; }
         //=================================================
         #endregion

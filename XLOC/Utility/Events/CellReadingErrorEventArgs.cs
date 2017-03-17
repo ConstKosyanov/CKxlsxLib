@@ -9,7 +9,7 @@ namespace XLOC.Utility.Events
         public string Reference { get; internal set; }
         public uint Row { get; set; }
         public CellValues? SourceType { get; internal set; }
-        public xlContentType? OutputType { get; internal set; }
+        public XlContentType? OutputType { get; internal set; }
         public object Value { get; internal set; }
         public SheetIdentifier Sheet { get; set; }
     }

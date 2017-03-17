@@ -7,31 +7,23 @@ using XLOC.Utility;
 namespace ExcelReaderUnitTestProject
 {
     [TestClass]
-    public class xlSheetTester
+    public class XlSheetTester
     {
-        xlSheet xs;
+        XlSheet xs;
 
         [TestInitialize]
         public void Initialize()
         {
-            var xl = new xlBook();
+            var xl = new XlBook();
             xl.AddSheet("testList");
             xs = xl.Sheets.First();
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void NameValidation()
-        {
-            xs.Name = "test:";
-        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void NameValidation() => xs.Name = "test:";
 
-        [TestMethod]
-        [ExpectedException(typeof(IndexOutOfRangeException))]
-        public void FalseCellIndex()
-        {
-            var tmp = xs.Get(0, 0);
-        }
+        [TestMethod, ExpectedException(typeof(IndexOutOfRangeException))]
+        public void FalseCellIndex() => xs.Get(0, 0);
 
         [TestMethod]
         public void NameSet()
@@ -43,7 +35,7 @@ namespace ExcelReaderUnitTestProject
         [TestMethod]
         public void AddCell()
         {
-            xs.AddCell(1,1,1, xlContentType.Integer);
+            xs.AddCell(1, 1, 1, XlContentType.Integer);
             Assert.AreEqual(1, xs.Cells.Count());
         }
     }

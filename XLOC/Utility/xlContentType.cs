@@ -2,7 +2,7 @@
 
 namespace XLOC.Utility
 {
-    public enum xlContentType : byte
+    public enum XlContentType : byte
     {
         Void = 0,
         Boolean = 1,

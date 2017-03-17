@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace XLOC.Book
 {
-    public class xlSheet
+    public class XlSheet
     {
         #region Variables
         //=================================================
@@ -16,32 +16,28 @@ namespace XLOC.Book
 
         #region Constructor
         //=================================================
-        xlSheet(uint Id)
+        XlSheet(uint Id)
         {
-            Cells = new List<xlCell>();
+            Cells = new List<XlCell>();
             this.Id = Id;
         }
 
-        internal xlSheet(uint Id, string ListName)
-            : this(Id)
-        {
-            Name = ListName;
-        }
+        internal XlSheet(uint Id, string ListName) : this(Id) => Name = ListName;
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public xlCell AddCell()
+        public XlCell AddCell()
         {
-            var result = new xlCell();
+            var result = new XlCell();
             Cells.Add(result);
             return result;
         }
 
-        public xlCell AddCell(object cellValue, int aRow, int aCol, xlContentType aType)
+        public XlCell AddCell(object cellValue, int aRow, int aCol, XlContentType aType)
         {
-            var result = AddCell();
+            XlCell result = AddCell();
             result.Value = cellValue;
             result.Row = aRow;
             result.Col = aCol;
@@ -49,9 +45,9 @@ namespace XLOC.Book
             return result;
         }
 
-        public xlCell AddCell(object cellValue, string aReference, xlContentType aType)
+        public XlCell AddCell(object cellValue, string aReference, XlContentType aType)
         {
-            var result = AddCell();
+            XlCell result = AddCell();
             result.Value = cellValue;
             result.Reference = aReference;
             result.Type = aType;
@@ -64,7 +60,7 @@ namespace XLOC.Book
         //=================================================
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (!value.rIsMatch(@"^[^\:\\\/\?\*\[\]]+$"))
@@ -73,33 +69,27 @@ namespace XLOC.Book
             }
         }
 
-        public IEnumerable<xlCell> this[uint rowIndex]
-        {
-            get
-            {
-                return Cells.Where(x => x.Row == rowIndex).ToArray();
-            }
-        }
+        public IEnumerable<XlCell> this[uint rowIndex] => Cells.Where(x => x.Row == rowIndex).ToArray();
 
-        public xlCell Get(uint col, uint row)
+        public XlCell Get(uint col, uint row)
         {
-            xlCell result = Cells.SingleOrDefault(x => x.Row == row && x.Col == col);
+            XlCell result = Cells.SingleOrDefault(x => x.Row == row && x.Col == col);
             if (result == null)
                 throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0},{1}] не найдена", row, col));
             else
                 return result;
         }
 
-        public xlCell Get(string Reference)
+        public XlCell Get(string Reference)
         {
-                xlCell result = Cells.SingleOrDefault(x => x.Reference == Reference);
-                if (result == null)
-                    throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0}] не найдена", Reference));
-                else
-                    return result;
+            XlCell result = Cells.SingleOrDefault(x => x.Reference == Reference);
+            if (result == null)
+                throw new IndexOutOfRangeException(string.Format("Ячейка с индексом [{0}] не найдена", Reference));
+            else
+                return result;
         }
 
-        public List<xlCell> Cells { get; set; }
+        public List<XlCell> Cells { get; set; }
         public uint Id { get; set; }
         //=================================================
         #endregion

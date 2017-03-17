@@ -14,20 +14,20 @@ namespace XLOC.Utility
         //=================================================
         public Map(Dictionary<string, string> dictionary) : base()
         {
-            var props = getProperties();
-            foreach (var prop in props)
+            IEnumerable<PropertyInfo> props = getProperties();
+            foreach (PropertyInfo prop in props)
             {
                 try
                 {
-                    var attr = GetAttribute<xlFieldAttribute>(prop);
-                    var tmp = dictionary.SingleOrDefault(x => x.Value.Equals(prop.Name, StringComparison.CurrentCultureIgnoreCase) || attr.Captions.Any(y => x.Value.Equals(y, StringComparison.CurrentCultureIgnoreCase)));
+                    XlFieldAttribute attr = getAttribute<XlFieldAttribute>(prop);
+                    KeyValuePair<string, string> tmp = dictionary.SingleOrDefault(x => x.Value.Equals(prop.Name, StringComparison.CurrentCultureIgnoreCase) || attr.Captions.Any(y => x.Value.Equals(y, StringComparison.CurrentCultureIgnoreCase)));
                     if (!isDefault(tmp))
                         this[tmp.Key.rMatch(@"^[A-Z]+")] = new MapItem { Attribute = attr, Property = prop };
                 }
                 catch (InvalidOperationException ex) { Exceptioins.Add(new InvalidOperationException($"Дублирование заголовков, {prop.Name}", ex)); }
             }
 
-            var captions = GetClassCaptions(true);
+            string[][] captions = getClassCaptions(true);
             MissingFields = captions.Where(x => Values.All(y => !y.Contains(x))).Select(x => x.First());
         }
         //=================================================
@@ -35,13 +35,12 @@ namespace XLOC.Utility
 
         #region static
         //=================================================
-        static string[][] GetClassCaptions(bool requiredOnly = false) => typeof(T).GetProperties()
-            .Where(x => Attribute.IsDefined(x, typeof(xlFieldAttribute)) && !(requiredOnly && (isNullable(x) || !isRequired(x))))
-            .Select(x => GetAttribute<xlFieldAttribute>(x).Captions.Union(new string[] { x.Name }).ToArray()).ToArray();
-        static IEnumerable<PropertyInfo> getProperties() => typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(xlFieldAttribute)));
-        static IEnumerable<Cell> GetCaptionCells(WorksheetPart sheet) => sheet.Worksheet.GetFirstChild<SheetData>().Descendants<Row>().First().Descendants<Cell>().Where(x => x.CellValue != null);
-        static AtttrType GetAttribute<AtttrType>(PropertyInfo x) where AtttrType : Attribute => (AtttrType)Attribute.GetCustomAttribute(x, typeof(AtttrType));
-        static bool isRequired(PropertyInfo x) => GetAttribute<xlFieldAttribute>(x).IsRequired;
+        static string[][] getClassCaptions(bool requiredOnly = false) => typeof(T).GetProperties()
+            .Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute)) && !(requiredOnly && (isNullable(x) || !isRequired(x))))
+            .Select(x => getAttribute<XlFieldAttribute>(x).Captions.Union(new string[] { x.Name }).ToArray()).ToArray();
+        static IEnumerable<PropertyInfo> getProperties() => typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute)));
+        static AtttrType getAttribute<AtttrType>(PropertyInfo x) where AtttrType : Attribute => (AtttrType)Attribute.GetCustomAttribute(x, typeof(AtttrType));
+        static bool isRequired(PropertyInfo x) => getAttribute<XlFieldAttribute>(x).IsRequired;
         static bool isNullable(PropertyInfo x) => x.PropertyType.IsGenericType && x.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
         static bool isDefault<type>(type item) => item.Equals(default(type));
         //=================================================

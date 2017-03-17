@@ -13,15 +13,13 @@ namespace XLOC.Utility.Extensions
         //=================================================
         internal static bool rIsMatch(this string local, string pattern, bool IgnoreCase = true) => Regex.IsMatch(local, pattern, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
         internal static string rMatch(this string local, string pattern, bool IgnoreCase = true) => Regex.Match(local, pattern, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None).Value;
-        internal static IEnumerable<string> rMatches(this string local, string pattern, bool IgnoreCase = true) => Regex.Matches(local, pattern, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None).Cast<Match>().Select(x => x.Value);
-        internal static string rReplace(this string local, string pattern, string replacement, bool IgnoreCase = true) => Regex.Replace(local, pattern, replacement, IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
         internal static bool HasValue(this string value) => !string.IsNullOrWhiteSpace(value);
         //=================================================
         #endregion
 
         public static void ForEach<T>(this IEnumerable<T> local, Action<T> action)
         {
-            var e = local.GetEnumerator();
+            IEnumerator<T> e = local.GetEnumerator();
             while (e.MoveNext())
                 action(e.Current);
         }

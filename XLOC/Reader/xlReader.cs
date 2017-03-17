@@ -11,7 +11,7 @@ using XLOC.Utility.Extensions;
 
 namespace XLOC.Reader
 {
-    public abstract class xlReader
+    public abstract class XlReader
     {
         #region Variables
         //=================================================
@@ -29,7 +29,7 @@ namespace XLOC.Reader
 
         #region Constructor
         //=================================================
-        protected xlReader(XLOCConfiguration configuration)
+        protected XlReader(XLOCConfiguration configuration)
         {
             _config = configuration;
             OnCellReadingError += (s, e) => { };
@@ -40,9 +40,9 @@ namespace XLOC.Reader
 
         #region private
         //=================================================
-        static object ConvertToTypeWitNullableCheck(object value, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? ConvertNullable(value, type) : Convert.ChangeType(value, type);
+        static object convertToTypeWitNullableCheck(object value, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) ? convertNullable(value, type) : Convert.ChangeType(value, type);
 
-        static object ConvertNullable(object value, Type type) => value != null ? Convert.ChangeType(value, type.GetGenericArguments().First()) : null;
+        static object convertNullable(object value, Type type) => value != null ? Convert.ChangeType(value, type.GetGenericArguments().First()) : null;
 
         protected object getValue(Cell cell, Type type)
         {
@@ -56,15 +56,15 @@ namespace XLOC.Reader
                     case CellValues.Date:
                         throw new NotImplementedException($"Преобразование для типа {type} не реализовано");
                     case CellValues.Number:
-                        return ConvertToTypeWitNullableCheck(cell.CellValue, type);
+                        return convertToTypeWitNullableCheck(cell.CellValue, type);
                     case CellValues.SharedString:
                         var RefId = int.Parse(cell.CellValue.Text);
                         return TypeDescriptor.GetConverter(type).ConvertFromString(_config.DocProvider.sharedStrings[RefId].HasValue() ? _config.DocProvider.sharedStrings[RefId] : string.Empty);
                     case CellValues.String:
                     case CellValues.InlineString:
-                        return ConvertToTypeWitNullableCheck(cell.CellValue?.Text, type);
+                        return convertToTypeWitNullableCheck(cell.CellValue?.Text, type);
                     default:
-                        return ConvertToTypeWitNullableCheck(ConvertTypelessCell(cell), type);
+                        return convertToTypeWitNullableCheck(ConvertTypelessCell(cell), type);
                 }
             }
             catch (Exception ex)
@@ -112,8 +112,7 @@ namespace XLOC.Reader
 
         private static decimal decimalParse(string item)
         {
-            decimal resul;
-            if (decimal.TryParse(item, out resul)) return resul;
+            if (decimal.TryParse(item, out var resul)) return resul;
             return Convert.ToDecimal(double.Parse(item, new System.Globalization.CultureInfo("En")));
         }
         //=================================================

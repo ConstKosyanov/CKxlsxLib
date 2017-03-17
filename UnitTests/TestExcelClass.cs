@@ -6,21 +6,21 @@ namespace ExcelReaderUnitTestProject
 {
     public class TestExcelClass
     {
-        [xlField(xlContentType.Integer, "Поле 1")]
+        [XlField(XlContentType.Integer, "Поле 1")]
         public int intProperty1 { get; set; }
-        [xlField(xlContentType.Integer, false, "Поле 2")]
+        [XlField(XlContentType.Integer, false, "Поле 2")]
         public int? intProperty2 { get; set; }
-        [xlField(xlContentType.Integer, false, "Поле 3")]
+        [XlField(XlContentType.Integer, false, "Поле 3")]
         public int? intProperty3 { get; set; }
-        [xlField(xlContentType.Double, "дробь")]
+        [XlField(XlContentType.Double, "дробь")]
         public decimal decimalProperty { get; set; }
-        [xlField(xlContentType.Date, "Какая-то дата")]
+        [XlField(XlContentType.Date, "Какая-то дата")]
         public DateTime SomeDate { get; set; }
-        [xlField(xlContentType.SharedString, false, "Какая-то строка")]
+        [XlField(XlContentType.SharedString, false, "Какая-то строка")]
         public string SomeString { get; set; }
-        [xlField(xlContentType.SharedString, false, "Мультизагаловок1", "Мультизагаловок2")]
+        [XlField(XlContentType.SharedString, false, "Мультизагаловок1", "Мультизагаловок2")]
         public string MultiCaption { get; set; }
-        [xlField(xlContentType.SharedString, false, "GuidField")]
+        [XlField(XlContentType.SharedString, false, "GuidField")]
         public Guid Guid { get; set; }
     }
 }

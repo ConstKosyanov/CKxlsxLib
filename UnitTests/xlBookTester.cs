@@ -9,24 +9,18 @@ using XLOC.Writer;
 namespace ExcelReaderUnitTestProject
 {
     [TestClass]
-    public class xlBookTester
+    public class XlBookTester
     {
         string list1 = "SharedStringTable";
         string list2 = "FormatedCells";
-        xlBook xl = new xlBook();
+        XlBook xl = new XlBook();
 
         [ClassInitialize]
-        public static void Initialize(TestContext ctx)
-        {
-            File.Delete(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), "test.xlsx"));
-        }
+        public static void Initialize(TestContext ctx) => File.Delete(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), "test.xlsx"));
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void NameValidation()
-        {
-            xl.Name = "test:";
-        }
+        public void NameValidation() => xl.Name = "test:";
 
         [TestMethod]
         public void NameSet()
@@ -41,16 +35,16 @@ namespace ExcelReaderUnitTestProject
             Assert.IsNotNull(xl.Sheets, "Список листов не определён");
             xl.AddSheet(list2);
             Assert.AreEqual(1, xl.Sheets.Count());
-            xl[0].AddCell(1, "A1",xlContentType.Integer);
-            xl[0].AddCell(DateTime.Now, "A2", xlContentType.Date);
-            xl[0].AddCell(3.14, "A3", xlContentType.Double);
+            xl[0].AddCell(1, "A1",XlContentType.Integer);
+            xl[0].AddCell(DateTime.Now, "A2", XlContentType.Date);
+            xl[0].AddCell(3.14, "A3", XlContentType.Double);
 
             xl.AddSheet(list1);
             var rnd = new Random();
-            xl[1].AddCell("Test", 1, 1, xlContentType.SharedString);
-            xl[1].AddCell("Test2", 2, 1, xlContentType.SharedString);
-            xl[1].AddCell("Test", 1, 2, xlContentType.SharedString);
-            xl[1].AddCell("Test3", 2, 2, xlContentType.SharedString);
+            xl[1].AddCell("Test", 1, 1, XlContentType.SharedString);
+            xl[1].AddCell("Test2", 2, 1, XlContentType.SharedString);
+            xl[1].AddCell("Test", 1, 2, XlContentType.SharedString);
+            xl[1].AddCell("Test3", 2, 2, XlContentType.SharedString);
 
             Assert.AreEqual(2, xl.Sheets.Count());
             Assert.AreEqual(list1, xl[1].Name, "Не задано имя листа");
@@ -84,10 +78,10 @@ namespace ExcelReaderUnitTestProject
                 AddSheet();
             try
             {
-                using (var file = File.Create(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name)))
+                using (FileStream file = File.Create(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name)))
                 {
-                    var writer = xlWriter.Create(xl);
-                    var err = writer.SaveToStream(file);
+                    var writer = XlWriter.Create(xl);
+                    DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = writer.SaveToStream(file);
                     if (err.Count() > 0)
                         Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
                 }
@@ -104,7 +98,7 @@ namespace ExcelReaderUnitTestProject
                 AddSheet();
             try
             {
-                var err = xlWriter.Create(xl).SaveToFile(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name));
+                DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = XlWriter.Create(xl).SaveToFile(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name));
                 if (err.Count() > 0)
                     Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
             }
@@ -115,13 +109,13 @@ namespace ExcelReaderUnitTestProject
         {
             try
             {
-                using (var file = File.Open(path, FileMode.Open))
+                using (FileStream file = File.Open(path, FileMode.Open))
                 {
-                    var streamReader = XLOC.XlConverter.FromStream(file);
+                    XLOC.XLOCReader streamReader = XLOC.XlConverter.FromStream(file);
                     xl = streamReader.ReadToBook();
                 }
 
-                var fileReader = XLOC.XlConverter.FromFile(path);
+                XLOC.XLOCReader fileReader = XLOC.XlConverter.FromFile(path);
                 xl = fileReader.ReadToBook();
             }
             catch (Exception ex) { Assert.Fail(string.Format("Ошибка чтения\n{0}", ex.Message)); }

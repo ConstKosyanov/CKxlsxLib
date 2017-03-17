@@ -15,6 +15,6 @@ namespace XLOC.Utility
         internal bool Contains(IEnumerable<string> items) => Attribute.Captions.Intersect(items, eq).Any() || items.Contains(Property.Name, eq);
 
         public System.Reflection.PropertyInfo Property { get; set; }
-        public xlFieldAttribute Attribute { get; set; }
+        public XlFieldAttribute Attribute { get; set; }
     }
 }

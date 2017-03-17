@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace XLOC.Book
 {
-    public class xlBook
+    public class XlBook
     {
         #region Variables
         //=================================================
@@ -14,23 +14,17 @@ namespace XLOC.Book
 
         #region Constructor
         //=================================================
-        public xlBook()
-        {
-            Sheets = new List<xlSheet>();
-        }
+        public XlBook() => Sheets = new List<XlSheet>();
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public void SaveAs(string path)
-        {
-            Writer.xlWriter.Create(this).SaveToFile(path);
-        }
+        public void SaveAs(string path) => Writer.XlWriter.Create(this).SaveToFile(path);
 
-        public xlSheet AddSheet(string name)
+        public XlSheet AddSheet(string name)
         {
-            var result = new xlSheet((uint)Sheets.Count + 1, name);
+            var result = new XlSheet((uint)Sheets.Count + 1, name);
             Sheets.Add(result);
             return result;
         }
@@ -41,7 +35,7 @@ namespace XLOC.Book
         //=================================================
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (value.rIsMatch(@"[\\\/\:\*\?\""\<\>\|]"))
@@ -49,8 +43,8 @@ namespace XLOC.Book
                 _name = string.Format("{0}.xlsx", value.rMatch(@"\w+(?=\.\w+$)?"));
             }
         }
-        public List<xlSheet> Sheets { get; set; }
-        public xlSheet this[int index] { get { return Sheets[index]; } }
+        public List<XlSheet> Sheets { get; set; }
+        public XlSheet this[int index] => Sheets[index];
         //=================================================
         #endregion
     }

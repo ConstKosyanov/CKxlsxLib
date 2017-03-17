@@ -12,7 +12,7 @@ using XLOC.Utility.Extensions;
 
 namespace XLOC.Writer
 {
-    public abstract class xlWriter
+    public abstract class XlWriter
     {
         #region Variables
         //=================================================
@@ -23,55 +23,45 @@ namespace XLOC.Writer
 
         #region Constructor
         //=================================================
-        public xlWriter()
-        {
-            sst = new Dictionary<string, int>();
-        }
+        public XlWriter() => sst = new Dictionary<string, int>();
         //=================================================
         #endregion
 
         #region Factory
         //=================================================
-        public static xlWriter Create(xlBook xlBook)
-        {
-            return new xlBookWriter(xlBook);
-        }
+        public static XlWriter Create(XlBook xlBook) => new XlBookWriter(xlBook);
 
-        public static xlWriter Create<T>(IEnumerable<T> items) where T : new()
-        {
-            return new xlArrayWriter<T>(items);
-        }
+        public static XlWriter Create<T>(IEnumerable<T> items) where T : new() => new XlArrayWriter<T>(items);
         //=================================================
         #endregion
 
         #region private
         //=================================================
-        void IntiWorkbook(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument document)
+        void intiWorkbook(SpreadsheetDocument document)
         {
             document.AddWorkbookPart();
             document.WorkbookPart.Workbook = new Workbook();
             document.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
-            InitStylesPart(document.WorkbookPart.AddNewPart<WorkbookStylesPart>());
+            initStylesPart(document.WorkbookPart.AddNewPart<WorkbookStylesPart>());
         }
 
-        WorksheetPart InitWorksheetPart(SpreadsheetDocument document, Sheet sheet)
+        WorksheetPart initWorksheetPart(SpreadsheetDocument document, Sheet sheet)
         {
-            var wsp = document.WorkbookPart.AddNewPart<WorksheetPart>();
+            WorksheetPart wsp = document.WorkbookPart.AddNewPart<WorksheetPart>();
             wsp.Worksheet = new Worksheet(new SheetData());
             sheet.Id = document.WorkbookPart.GetIdOfPart(wsp);
             document.WorkbookPart.Workbook.Sheets.Append(sheet);
             return wsp;
         }
 
-        void InitStylesPart(WorkbookStylesPart stylesPart)
+        void initStylesPart(WorkbookStylesPart stylesPart)
         {
             #region Old
             //=================================================
-            stylesPart.Stylesheet = new Stylesheet();
+            stylesPart.Stylesheet = new Stylesheet() { Fonts = new Fonts() };
 
             #region Fonts
             //=================================================
-            stylesPart.Stylesheet.Fonts = new Fonts();
             stylesPart.Stylesheet.Fonts.AppendChild(new Font());
             //=================================================
             #endregion
@@ -136,7 +126,7 @@ namespace XLOC.Writer
             #endregion
         }
 
-        void IntiSharedStringTablePart(SharedStringTablePart sharedStringTablePart)
+        void intiSharedStringTablePart(SharedStringTablePart sharedStringTablePart)
         {
             sharedStringTablePart.SharedStringTable = new SharedStringTable();
             sharedStringTablePart.SharedStringTable.Append(sst.Keys.Select(x => new SharedStringItem(new Text(x))));
@@ -145,19 +135,16 @@ namespace XLOC.Writer
 
         void fillSheet(WorksheetPart p, Sheet x)
         {
-            foreach (var item in GetRows(x.SheetId))
+            foreach (Row item in GetRows(x.SheetId))
             {
                 item.Append(GetCellsInRow(x.SheetId, item.RowIndex));
                 p.Worksheet.GetFirstChild<SheetData>().Append(item);
             }
         }
 
-        protected int getSharedStringId(string Key)
-        {
-            return sst.ContainsKey(Key) ? sst[Key] : sst[Key] = sstNext++;
-        }
+        protected int getSharedStringId(string Key) => sst.ContainsKey(Key) ? sst[Key] : sst[Key] = sstNext++;
 
-        protected Cell CovertCell(Cell cell, object Value, xlContentType? Type)
+        protected Cell CovertCell(Cell cell, object Value, XlContentType? Type)
         {
             if (Value == null)
                 return cell;
@@ -166,23 +153,23 @@ namespace XLOC.Writer
             {
                 switch (Type)
                 {
-                    case xlContentType.Boolean:
-                        throw new NotImplementedException(string.Format("Не реализован обработчик записи ячеек с типом {0}", xlContentType.Boolean));
-                    case xlContentType.Integer:
+                    case XlContentType.Boolean:
+                        throw new NotImplementedException(string.Format("Не реализован обработчик записи ячеек с типом {0}", XlContentType.Boolean));
+                    case XlContentType.Integer:
                         cell.CellValue = new CellValue(Value.ToString());
                         break;
-                    case xlContentType.Double:
+                    case XlContentType.Double:
                         cell.CellValue = new CellValue(Convert.ToString(Value, new System.Globalization.CultureInfo("En")));
                         cell.DataType = null;
                         cell.StyleIndex = 2;
                         break;
-                    case xlContentType.SharedString:
+                    case XlContentType.SharedString:
                         cell.CellValue = new CellValue(getSharedStringId(Value.ToString()).ToString());
                         cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
                         break;
-                    case xlContentType.String:
-                        throw new NotImplementedException(string.Format("Не реализован обработчик записи ячеек с типом {0}", xlContentType.String));
-                    case xlContentType.Date:
+                    case XlContentType.String:
+                        throw new NotImplementedException(string.Format("Не реализован обработчик записи ячеек с типом {0}", XlContentType.String));
+                    case XlContentType.Date:
                         cell.CellValue = new CellValue(((DateTime)Value).ToOADate().ToString());
                         cell.DataType = null;
                         cell.StyleIndex = 1;
@@ -211,7 +198,7 @@ namespace XLOC.Writer
         {
             try
             {
-                using (var file = File.Open(path, FileMode.OpenOrCreate))
+                using (FileStream file = File.Open(path, FileMode.OpenOrCreate))
                 {
                     return SaveToStream(file);
                 }
@@ -227,9 +214,9 @@ namespace XLOC.Writer
             sst = new Dictionary<string, int>();
             using (var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
             {
-                IntiWorkbook(doc);
-                GetSheets().ForEach((x) => fillSheet(InitWorksheetPart(doc, x), x));
-                IntiSharedStringTablePart(doc.WorkbookPart.AddNewPart<SharedStringTablePart>());
+                intiWorkbook(doc);
+                GetSheets().ForEach((x) => fillSheet(initWorksheetPart(doc, x), x));
+                intiSharedStringTablePart(doc.WorkbookPart.AddNewPart<SharedStringTablePart>());
                 doc.WorkbookPart.Workbook.Save();
 
                 OpenXmlValidator validator = new OpenXmlValidator();
@@ -240,7 +227,7 @@ namespace XLOC.Writer
         public ValidationErrorInfo[] SaveToBuffer(out byte[] result)
         {
             MemoryStream stream = new MemoryStream();
-            var res = SaveToStream(stream);
+            ValidationErrorInfo[] res = SaveToStream(stream);
             result = stream.ToArray();
             return res;
         }

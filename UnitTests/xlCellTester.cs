@@ -6,22 +6,22 @@ using XLOC.Utility;
 namespace ExcelReaderUnitTestProject
 {
     [TestClass]
-    public class xlCellTester
+    public class XlCellTester
     {
-        xlBook xl = new xlBook();
-        xlSheet xs;
+        XlBook xl = new XlBook();
+        XlSheet xs;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            xl = new xlBook();
+            xl = new XlBook();
             xs = xl.AddSheet("test");
         }
 
         [TestMethod]
         public void Constructor0()
         {
-            var cell = xs.AddCell(1, 1, 1, xlContentType.Integer);
+            XlCell cell = xs.AddCell(1, 1, 1, XlContentType.Integer);
             Assert.IsNotNull(cell);
         }
 
@@ -29,21 +29,21 @@ namespace ExcelReaderUnitTestProject
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Constructor1()
         {
-            var cell = xs.AddCell(DateTime.Now, 0, 0, xlContentType.Date);
+            XlCell cell = xs.AddCell(DateTime.Now, 0, 0, XlContentType.Date);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void Reference0()
         {
-            var cell = xs.AddCell(DateTime.Now, 1, 1, xlContentType.Date);
+            XlCell cell = xs.AddCell(DateTime.Now, 1, 1, XlContentType.Date);
             cell.Reference = "asdasd a";
         }
 
         [TestMethod]
         public void Reference1()
         {
-            var cell = xs.AddCell(1, 1, 1, xlContentType.Integer);
+            XlCell cell = xs.AddCell(1, 1, 1, XlContentType.Integer);
             cell.Reference = "A1";
             Assert.AreEqual("A1", cell.Reference);
             Assert.AreEqual(1, cell.Row);
@@ -69,7 +69,7 @@ namespace ExcelReaderUnitTestProject
         [TestMethod]
         public void Reference()
         {
-            var cell = xs.AddCell(DateTime.Now, 1, 1, xlContentType.Date);
+            XlCell cell = xs.AddCell(DateTime.Now, 1, 1, XlContentType.Date);
             Assert.AreEqual("A1", cell.Reference);
             cell.Col = 15;
             cell.Row = 2;
