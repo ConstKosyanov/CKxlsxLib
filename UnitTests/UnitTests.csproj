@@ -73,6 +73,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestExcelClass.cs" />
     <Compile Include="UnnamedFieldTester.cs" />
+    <Compile Include="Utility\Events\SheetValidationErrorEventArgsTests.cs" />
+    <Compile Include="Utility\Exceptions\OpenXmlValidationExceptionTests.cs" />
+    <Compile Include="Utility\SheetIdentifierTests.cs" />
     <Compile Include="WriterTester.cs" />
     <Compile Include="xlClassImportTester.cs" />
     <Compile Include="xlCellTester.cs" />
