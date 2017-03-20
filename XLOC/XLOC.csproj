@@ -50,7 +50,7 @@
     <Compile Include="Utility\Map.cs" />
     <Compile Include="Utility\XLOCSheet.cs" />
     <Compile Include="Utility\SheetIdentifier.cs" />
-    <Compile Include="Utility\SkipModeEnum.cs" />
+    <Compile Include="Utility\Enums\SkipModeEnum.cs" />
     <Compile Include="XLOCConfiguration.cs" />
     <Compile Include="Reader\XlArrayReader.cs" />
     <Compile Include="Utility\DocDictionaries.cs" />
@@ -70,11 +70,12 @@
     <Compile Include="Writer\XlBookWriter.cs" />
     <Compile Include="Writer\XlWriter.cs" />
     <Compile Include="Utility\XlAttribute.cs" />
-    <Compile Include="Utility\XlContentType.cs" />
+    <Compile Include="Utility\Enums\XlContentType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
