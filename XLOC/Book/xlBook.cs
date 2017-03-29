@@ -20,7 +20,7 @@ namespace XLOC.Book
 
         #region Methods
         //=================================================
-        public void SaveAs(string path) => Writer.XlWriter.Create(this).SaveToFile(path);
+        public void SaveAs(string path) => XlConverter.FromBook(this).SaveToFile(path);
 
         public XlSheet AddSheet(string name)
         {

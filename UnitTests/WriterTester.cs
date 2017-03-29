@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using XLOC.Book;
 using XLOC.Utility;
-using XLOC.Writer;
+using XLOC;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -18,7 +18,7 @@ namespace ExcelReaderUnitTestProject
             book.Sheets.First().AddCell(12.3, "B2", XlContentType.Double);
             book.Sheets.First().AddCell(DateTime.Now, "C3", XlContentType.Date);
             book.Sheets.First().AddCell("asdasd", "D4", XlContentType.SharedString);
-            var err = XlWriter.Create(book).SaveToStream(new System.IO.MemoryStream());
+            var err = XlConverter.FromBook(book).SaveToStream(new System.IO.MemoryStream());
             if (err.Count() > 0)
                 Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
         }

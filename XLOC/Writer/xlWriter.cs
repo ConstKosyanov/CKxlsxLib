@@ -27,14 +27,6 @@ namespace XLOC.Writer
         //=================================================
         #endregion
 
-        #region Factory
-        //=================================================
-        public static XlWriter Create(XlBook xlBook) => new XlBookWriter(xlBook);
-
-        public static XlWriter Create<T>(IEnumerable<T> items) where T : new() => new XlArrayWriter<T>(items);
-        //=================================================
-        #endregion
-
         #region private
         //=================================================
         void intiWorkbook(SpreadsheetDocument document)

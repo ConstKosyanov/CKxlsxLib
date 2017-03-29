@@ -5,6 +5,7 @@ using System.Linq;
 using XLOC.Book;
 using XLOC.Utility;
 using XLOC.Writer;
+using XLOC;
 
 namespace ExcelReaderUnitTestProject
 {
@@ -80,7 +81,7 @@ namespace ExcelReaderUnitTestProject
             {
                 using (FileStream file = File.Create(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name)))
                 {
-                    var writer = XlWriter.Create(xl);
+                    XlWriter writer = XlConverter.FromBook(xl);
                     DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = writer.SaveToStream(file);
                     if (err.Count() > 0)
                         Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
@@ -98,7 +99,7 @@ namespace ExcelReaderUnitTestProject
                 AddSheet();
             try
             {
-                DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = XlWriter.Create(xl).SaveToFile(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name));
+                DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = XlConverter.FromBook(xl).SaveToFile(string.Format(@"{0}\{1}", Path.Combine(Environment.CurrentDirectory), xl.Name));
                 if (err.Count() > 0)
                     Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
             }

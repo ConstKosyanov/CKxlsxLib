@@ -48,7 +48,7 @@ namespace ExcelReaderUnitTestProject
         [TestMethod]
         public void Write()
         {
-            DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = XlWriter.Create(data).SaveToFile(path);
+            DocumentFormat.OpenXml.Validation.ValidationErrorInfo[] err = XlConverter.FromEnumerable(data).SaveToFile(path);
             if (err.Count() > 0)
                 Assert.Fail("Ошибка сохранения:\n{0}", string.Join("\n", err.Select(x => x.Description)));
         }
@@ -99,7 +99,7 @@ namespace ExcelReaderUnitTestProject
                 //=================================================
                 #endregion
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
 
                 TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
                 Assert.AreEqual(2, data.Count());
@@ -141,7 +141,7 @@ namespace ExcelReaderUnitTestProject
                 //=================================================
                 #endregion
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
 
                 TestExcelClass[] data = XLOC.XlConverter.FromStream(memstream, new XLOCConfiguration { CellReadingErrorEvent = (s, e) => { throw new Exception(e.Exception.Message); } }).ReadToArray<TestExcelClass>();
                 Assert.AreEqual(2, data.Count());
@@ -172,7 +172,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
 
                 var isValid = true;
                 TestExcelClass[] data = XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => isValid = false }).ReadToEnumerable<TestExcelClass>().ToArray();
@@ -201,7 +201,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"Какая-то строка{i}", $"C{i}", XlContentType.SharedString);
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
 
                 XlConverter.FromStream(memstream, new XLOCConfiguration { ValidationFailureEvent = (s, e) => { if (!e.MissingFields.Contains("Поле 1") || e.Sheet.Name != sheetName) Assert.Fail(); } }).ReadToArray<TestExcelClass>();
                 TestExcelClass[] data = XlConverter.FromStream(memstream).ReadToEnumerable<TestExcelClass>().ToArray();
@@ -229,7 +229,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"Какая-то строка{i}", $"C{i}", XlContentType.SharedString);
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
                 bool result = true;
                 XlConverter.FromStream(memstream, new XLOCConfiguration { CellReadingErrorEvent = (s, e) => { if (e.Reference != "A2") result = false; }, AutoDispose = false }).ReadToArray<TestExcelClass>();
                 Assert.IsFalse(result);
@@ -259,7 +259,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
                 XLOCReader conv = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.None, SkipCount = 4 });
                 Assert.AreEqual(countShouldBe, conv.ReadToArray<TestExcelClass>().Count());
             }
@@ -289,7 +289,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
                 XLOCReader convertor = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.Manual, SkipCount = 2 });
                 Assert.AreEqual(countShouldBe, convertor.ReadToArray<TestExcelClass>().Count());
             }
@@ -323,7 +323,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"0.1{i}", $"E{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
                 XLOCReader convertor = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto, SkipCount = 1 });
                 Assert.AreEqual(countShouldBe, convertor.ReadToArray<TestExcelClass>().Count());
             }
@@ -353,7 +353,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"noize", $"AC{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(memstream);
+                XlConverter.FromBook(book).SaveToStream(memstream);
                 TestExcelClass[] data = XlConverter.FromStream(memstream, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto, ContinueOnRowReadingError = false }).ReadToArray<TestExcelClass>();
                 Assert.AreEqual(countShouldBe, data.Count());
                 Assert.IsTrue(data.All(x => x.decimalProperty != 0));
@@ -384,7 +384,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell($"noize", $"AC{i}", XlContentType.Double);
                 }
 
-                XlWriter.Create(book).SaveToStream(ms);
+                XlConverter.FromBook(book).SaveToStream(ms);
                 IEnumerable<TestExcelClass> data = XlConverter.FromStream(ms, new XLOCConfiguration { SkipMode = SkipModeEnum.Auto, ContinueOnRowReadingError = false, AutoDispose = false }).ReadToEnumerable<TestExcelClass>();
                 Assert.AreEqual(countShouldBe, data.Count());
                 Assert.IsTrue(data.All(x => x.decimalProperty != 0));
@@ -421,7 +421,7 @@ namespace ExcelReaderUnitTestProject
                     }
                 }
 
-                XlWriter.Create(book).SaveToStream(ms);
+                XlConverter.FromBook(book).SaveToStream(ms);
                 IEnumerable<IGrouping<SheetIdentifier, TestExcelClass>> data = XlConverter.FromStream(ms, new XLOCConfiguration { }).ReadToGroup<TestExcelClass>();
 
                 Assert.AreEqual(result.Count, data.Count(), "Количество листов не совпадает");
@@ -459,7 +459,7 @@ namespace ExcelReaderUnitTestProject
                             sheet.AddCell(item.Filler(j), $"{item.Col}{j}", item.contentType);
                 }
 
-                XlWriter.Create(book).SaveToStream(ms);
+                XlConverter.FromBook(book).SaveToStream(ms);
                 IEnumerable<IGrouping<SheetIdentifier, TestExcelClass>> data = XlConverter.FromStream(ms, new XLOCConfiguration { }).ReadToGroup<TestExcelClass>();
 
                 Assert.AreEqual(result.Count, data.Count(), "Количество листов не совпадает");
@@ -499,7 +499,7 @@ namespace ExcelReaderUnitTestProject
                     sheet.AddCell(i * 2, $"B{i}", XlContentType.Integer);
                 }
 
-                XlWriter.Create(book).SaveToStream(ms);
+                XlConverter.FromBook(book).SaveToStream(ms);
                 XLOCReader reader = XlConverter.FromStream(ms, new XLOCConfiguration { });
 
                 IEnumerable<IGrouping<SheetIdentifier, TestExcelClass>> res1 = reader.ReadToGroup<TestExcelClass>();

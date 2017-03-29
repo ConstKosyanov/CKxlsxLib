@@ -20,6 +20,9 @@ namespace XLOC
         }
 
         public static XLOCReader FromBuffer(byte[] buf, XLOCConfiguration configuration = null) => FromStream(new MemoryStream(buf), configuration);
+
+        public static Writer.XlWriter FromEnumerable<T>(IEnumerable<T> data) => new Writer.XlArrayWriter<T>(data);
+        public static Writer.XlWriter FromBook(XlBook book) => new Writer.XlBookWriter(book);
     }
 
     public class XLOCReader
