@@ -25,9 +25,7 @@ namespace XLOC.Writer
         protected override IEnumerable<Sheet> GetSheets()
         {
             foreach (XlSheet item in _xlBook.Sheets)
-            {
                 yield return new Sheet() { SheetId = item.Id, Name = item.Name };
-            }
         }
 
         protected override IEnumerable<Row> GetRows(uint SheetId) => _xlBook.Sheets.Single(x => x.Id == SheetId)
@@ -37,9 +35,7 @@ namespace XLOC.Writer
         protected override IEnumerable<Cell> GetCellsInRow(UInt32Value SheetId, UInt32Value RowId)
         {
             foreach (XlCell item in _xlBook.Sheets.Single(x => x.Id == SheetId.Value).Cells.Where(x => x.Row == RowId.Value))
-            {
                 yield return CovertCell(new Cell() { CellReference = item.Reference }, item.Value, item.Type);
-            }
         }
         //=================================================
         #endregion

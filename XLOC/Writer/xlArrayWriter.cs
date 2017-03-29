@@ -5,6 +5,7 @@ using XLOC.Utility.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace XLOC.Writer
 {
@@ -24,57 +25,68 @@ namespace XLOC.Writer
         //=================================================
         #endregion
 
-        #region Private
+        #region private
         //=================================================
-        protected override IEnumerable<Sheet> GetSheets()
+
+        #region Factory
+        //=================================================
+        static Sheet createSheet() => new Sheet()
         {
-            yield return new Sheet() { SheetId = new UInt32Value(_defId), Name = new StringValue(new string(typeof(T).ToString().rMatch(@"(?<=\.).+?$").Take(_SheetNameMaxLength).ToArray())) };
-        }
+            SheetId = new UInt32Value(_defId),
+            Name = new StringValue(new string(typeof(T).Name.Take(_SheetNameMaxLength).ToArray()))
+        };
+
+        static Row createRow(uint i) => new Row()
+        {
+            RowIndex = new UInt32Value(i),
+            Spans = new ListValue<StringValue>(new StringValue[] { new StringValue($"1:{typeof(T).GetProperties().Count()}") })
+        };
+
+        static Cell createCell(int index, int ColCounter) => new Cell()
+        {
+            CellReference = new StringValue(Book.XlCell.GetReference(ColCounter, index))
+        };
+        //=================================================
+        #endregion
+
+        static XlContentType getContentType(System.Reflection.PropertyInfo property) => ((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).ContentType;
+
+        protected override IEnumerable<Sheet> GetSheets() => new[] { createSheet() };
 
         protected override IEnumerable<Row> GetRows(uint SheetId)
         {
-            Row[] result = new Row[items.Count() + 1];
-            for (uint i = 0; i < result.Length; i++)
-            {
-                result[i] = new Row() { RowIndex = new UInt32Value(i+1), Spans = new ListValue<StringValue>(new StringValue[] { new StringValue(string.Format("1:{0}", typeof(T).GetProperties().Count())) }) };
-            }
-            return result;
+            for (uint i = 1; i <= items.Count() + 1; i++)
+                yield return createRow(i);
         }
 
-        protected override IEnumerable<Cell> GetCellsInRow(UInt32Value SheetId, UInt32Value RowId)
-        {
-            if (RowId.Value == 1)
-            {
-                return getCaptions();
-            }
-            else
-            {
-                return getValuesFrom((int)RowId.Value);
-            }
-        }
-
-        IEnumerable<Cell> getValuesFrom(int index)
-        {
-            T item = items[index - 2];
-            int ColCounter = 1;
-            foreach (System.Reflection.PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
-            {
-                yield return property.GetValue(item) != null ? CovertCell(new Cell() { CellReference = new StringValue(Book.XlCell.GetReference(ColCounter, index)) }, property.GetValue(item), ((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).ContentType) : null;
-                ColCounter++;
-            }
-            yield break;
-        }
+        protected override IEnumerable<Cell> GetCellsInRow(UInt32Value SheetId, UInt32Value RowId) => RowId.Value == 1
+            ? getCaptions()
+            : getValuesFrom((int)RowId.Value);
 
         IEnumerable<Cell> getCaptions()
         {
             int ColCounter = 1;
-            foreach (System.Reflection.PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
+            foreach (PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
             {
-                var attr = (XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute));
-                var cell = new Cell() { CellReference = new StringValue(Book.XlCell.GetReference(ColCounter++, 1)) };
-                cell.CellValue = new CellValue(getSharedStringId(attr.Captions.First()).ToString());
+                Cell cell = createCell(1, ColCounter++);
+                cell.CellValue = new CellValue(getSharedStringId(((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).Captions.First()).ToString());
                 cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
                 yield return cell;
+            }
+        }
+
+        static IEnumerable<PropertyInfo> getProperties() => typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute)));
+
+        IEnumerable<Cell> getValuesFrom(int index)
+        {
+            T item = items[index - 2];
+            int ColCounter = 0;
+            foreach (PropertyInfo property in getProperties())
+            {
+                ColCounter++;
+                yield return property.GetValue(item) != null
+                    ? CovertCell(createCell(index, ColCounter), property.GetValue(item), getContentType(property))
+                    : null;
             }
         }
         //=================================================

@@ -16,14 +16,16 @@ namespace XLOC.Writer
     {
         #region Variables
         //=================================================
-        protected Dictionary<string, int> sst;
+        protected Dictionary<string, int> sst { get; } = new Dictionary<string, int>();
         protected int sstNext = 0;
         //=================================================
         #endregion
 
-        #region Constructor
+        #region abstract
         //=================================================
-        public XlWriter() => sst = new Dictionary<string, int>();
+        protected abstract IEnumerable<Sheet> GetSheets();
+        protected abstract IEnumerable<Row> GetRows(uint SheetId);
+        protected abstract IEnumerable<Cell> GetCellsInRow(UInt32Value SheetId, UInt32Value RowId);
         //=================================================
         #endregion
 
@@ -33,7 +35,7 @@ namespace XLOC.Writer
         {
             document.AddWorkbookPart();
             document.WorkbookPart.Workbook = new Workbook();
-            document.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
+            document.WorkbookPart.Workbook.AppendChild(new Sheets());
             initStylesPart(document.WorkbookPart.AddNewPart<WorkbookStylesPart>());
         }
 
@@ -48,8 +50,6 @@ namespace XLOC.Writer
 
         void initStylesPart(WorkbookStylesPart stylesPart)
         {
-            #region Old
-            //=================================================
             stylesPart.Stylesheet = new Stylesheet() { Fonts = new Fonts() };
 
             #region Fonts
@@ -114,8 +114,6 @@ namespace XLOC.Writer
             #endregion
 
             stylesPart.Stylesheet.Save();
-            //=================================================
-            #endregion
         }
 
         void intiSharedStringTablePart(SharedStringTablePart sharedStringTablePart)
@@ -133,9 +131,12 @@ namespace XLOC.Writer
                 p.Worksheet.GetFirstChild<SheetData>().Append(item);
             }
         }
+        //=================================================
+        #endregion
 
+        #region protected
+        //=================================================
         protected int getSharedStringId(string Key) => sst.ContainsKey(Key) ? sst[Key] : sst[Key] = sstNext++;
-
         protected Cell CovertCell(Cell cell, object Value, XlContentType? Type)
         {
             if (Value == null)
@@ -177,43 +178,37 @@ namespace XLOC.Writer
                 throw new Exception("Ошибка преобразования ячейки", ex);
             }
         }
-
-        protected abstract IEnumerable<Sheet> GetSheets();
-        protected abstract IEnumerable<Row> GetRows(uint SheetId);
-        protected abstract IEnumerable<Cell> GetCellsInRow(UInt32Value SheetId, UInt32Value RowId);
         //=================================================
         #endregion
 
         #region Methods
         //=================================================
-        public ValidationErrorInfo[] SaveToFile(string path)
-        {
-            try
-            {
-                using (FileStream file = File.Open(path, FileMode.OpenOrCreate))
-                {
-                    return SaveToStream(file);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new IOException(string.Format("Не удалось сохранить файл {0}", path), ex);
-            }
-        }
-
         public ValidationErrorInfo[] SaveToStream(Stream stream)
         {
-            sst = new Dictionary<string, int>();
             using (var doc = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
             {
                 intiWorkbook(doc);
-                GetSheets().ForEach((x) => fillSheet(initWorksheetPart(doc, x), x));
+
+                foreach (Sheet item in GetSheets())
+                    fillSheet(initWorksheetPart(doc, item), item);
+                
                 intiSharedStringTablePart(doc.WorkbookPart.AddNewPart<SharedStringTablePart>());
+
                 doc.WorkbookPart.Workbook.Save();
 
                 OpenXmlValidator validator = new OpenXmlValidator();
                 return validator.Validate(doc).ToArray();
             }
+        }
+
+        public ValidationErrorInfo[] SaveToFile(string path)
+        {
+            try
+            {
+                using (FileStream file = File.Open(path, FileMode.OpenOrCreate))
+                    return SaveToStream(file);
+            }
+            catch (Exception ex) { throw new IOException(string.Format("Не удалось сохранить файл {0}", path), ex); }
         }
 
         public ValidationErrorInfo[] SaveToBuffer(out byte[] result)
