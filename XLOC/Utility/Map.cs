@@ -37,7 +37,7 @@ namespace XLOC.Utility
         //=================================================
         static string[][] getClassCaptions(bool requiredOnly = false) => typeof(T).GetProperties()
             .Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute)) && !(requiredOnly && (isNullable(x) || !isRequired(x))))
-            .Select(x => getAttribute<XlFieldAttribute>(x).Captions.Union(new string[] { x.Name }).ToArray()).ToArray();
+            .Select(x => getAttribute<XlFieldAttribute>(x).Captions.DefaultIfEmpty(x.Name).ToArray()).ToArray();
         static IEnumerable<PropertyInfo> getProperties() => typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute)));
         static AtttrType getAttribute<AtttrType>(PropertyInfo x) where AtttrType : Attribute => (AtttrType)Attribute.GetCustomAttribute(x, typeof(AtttrType));
         static bool isRequired(PropertyInfo x) => getAttribute<XlFieldAttribute>(x).IsRequired;

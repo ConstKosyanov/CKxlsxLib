@@ -69,7 +69,7 @@ namespace XLOC.Writer
             foreach (PropertyInfo property in typeof(T).GetProperties().Where(x => Attribute.IsDefined(x, typeof(XlFieldAttribute))))
             {
                 Cell cell = createCell(1, ColCounter++);
-                cell.CellValue = new CellValue(getSharedStringId(((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).Captions.First()).ToString());
+                cell.CellValue = new CellValue(getSharedStringId(((XlFieldAttribute)Attribute.GetCustomAttribute(property, typeof(XlFieldAttribute))).Captions.DefaultIfEmpty(property.Name).First()).ToString());
                 cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
                 yield return cell;
             }
